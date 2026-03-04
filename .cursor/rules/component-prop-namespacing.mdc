@@ -1,0 +1,41 @@
+---
+alwaysApply: true
+---
+
+# Component Prop Namespacing
+
+When a display controller clones its children (via `React.cloneElement`) to pass
+props down, all injected props **must be grouped under a single object key named
+after the component** (lowercase).
+
+## Rule
+
+```
+cloneElement(child, { <componentName>: { ...props } })
+```
+
+## Example — Fold
+
+`FoldDisplay` injects `isOpen` and `toggle` under the `fold` key:
+
+```jsx
+// ✅ correct
+cloneElement(child, { fold: { isOpen, toggle } })
+
+// ❌ incorrect — props are spread at the top level
+cloneElement(child, { isOpen, toggle })
+```
+
+Child components destructure from that namespaced key:
+
+```jsx
+// ✅ correct
+const FoldTrigger = ({ fold: { isOpen, toggle } = {}, children }) => ...
+const FoldContent = ({ fold: { isOpen } = {}, children }) => ...
+```
+
+This keeps the prop surface of each child unambiguous and prevents collisions
+when components are nested or composed together.
+
+See [src/components/Fold/fold.jsx](mdc:src/components/Fold/fold.jsx) for the
+reference implementation.

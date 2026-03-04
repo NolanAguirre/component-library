@@ -1,0 +1,48 @@
+.row {
+  display: flex;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* ── Header ──────────────────────────────────────────────── */
+
+.row__header {
+  padding: 0.65rem 1.25rem;
+  background: #f9fafb;
+  border-right: 1px solid #e5e7eb;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+/* ── Section ─────────────────────────────────────────────── */
+
+.row__section {
+  padding: 0.65rem 1.25rem;
+  color: #374151;
+  line-height: 1.5;
+  border-right: 1px solid #f3f4f6;
+}
+
+.row__section:last-child {
+  border-right: none;
+}
+
+/* ── Label ───────────────────────────────────────────────── */
+
+.row__label {
+  display: block;
+  margin-bottom: 0.2rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+

@@ -1,0 +1,19 @@
+---
+alwaysApply: true
+---
+
+# Component File Structure
+
+Each component lives in its own directory under `src/components/`:
+
+```
+src/components/<ComponentName>/
+  <componentName>.jsx   ← component logic
+  styles.css            ← component-scoped styles
+```
+
+- Directory names use **PascalCase** (e.g. `Fold/`, `Form/`)
+- The JSX file uses **camelCase** matching the directory (e.g. `fold.jsx`)
+- Every component **must** have its own `styles.css`; styles are not shared across components
+
+See [src/components/Fold/](mdc:src/components/Fold) as the reference structure.
