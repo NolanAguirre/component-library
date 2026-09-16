@@ -1,0 +1,12 @@
+.masonry {
+  width: 100%;
+}
+
+.masonry__list {
+  width: 100%;
+}
+
+.masonry__item {
+  padding: calc(var(--masonry-gap, 1rem) / 2);
+  box-sizing: border-box;
+}

@@ -1,0 +1,9 @@
+.grid__item {
+  display: flex;
+  min-width: 0;
+}
+
+.grid__item > * {
+  flex: 1;
+  min-width: 0;
+}

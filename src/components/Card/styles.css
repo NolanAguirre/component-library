@@ -1,29 +1,29 @@
 .card {
-  border: 1px solid #e5e7eb;
+  border: 1px solid #374151;
   border-radius: 8px;
   overflow: hidden;
-  background: #ffffff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  background: #1f2937;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 /* ── Header ──────────────────────────────────────────────── */
 
 .card__header {
   padding: 1rem 1.25rem 0.75rem;
-  background: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
+  background: #111827;
+  border-bottom: 1px solid #374151;
   font-size: 1.05rem;
   font-weight: 600;
-  color: #111827;
+  color: #f9fafb;
 }
 
 /* ── Section ─────────────────────────────────────────────── */
 
 .card__section {
   padding: 0.65rem 1.25rem;
-  color: #374151;
+  color: #d1d5db;
   line-height: 1.5;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid #374151;
 }
 
 .card__section:last-child {
@@ -34,7 +34,7 @@
 
 .card__row {
   display: flex;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid #374151;
 }
 
 .card__row:last-child {
@@ -43,7 +43,7 @@
 
 .card__row .card__section {
   border-bottom: none;
-  border-right: 1px solid #f3f4f6;
+  border-right: 1px solid #374151;
 }
 
 .card__row .card__section:last-child {
@@ -61,4 +61,3 @@
   text-transform: uppercase;
   color: #6b7280;
 }
-

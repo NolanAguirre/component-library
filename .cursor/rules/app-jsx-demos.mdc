@@ -1,0 +1,11 @@
+---
+alwaysApply: true
+---
+
+# App.jsx Component Demo Registration
+
+Every new component needs a demo in `src/App.jsx`:
+
+- Own `<Section title="ComponentName">` (or group under a related section for sub-components).
+- Wrap demos in `<Fold>` closed by default, with `<FoldTrigger>` / `<FoldContent>`.
+- Import alongside other `App.jsx` imports.

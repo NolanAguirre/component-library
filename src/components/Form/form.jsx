@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, Children, cloneElement } from 'react'
+import { useState, useEffect, useRef, Children, cloneElement, isValidElement } from 'react'
 import createFormManager from './formManager'
 import './styles.css'
 
@@ -22,7 +22,7 @@ export const FormDisplay = ({ form = {}, children }) => {
   }
 
   const enhanced = Children.map(children, (child) =>
-    cloneElement(child, { form })
+    isValidElement(child) && typeof child.type !== 'string' ? cloneElement(child, { form }) : child
   )
 
   return (
@@ -61,7 +61,7 @@ export const FormField = ({ form = {}, name, children }) => {
   const hasError = field.touched && field.error
 
   const enhanced = Children.map(children, (child) =>
-    cloneElement(child, { field })
+    isValidElement(child) && typeof child.type !== 'string' ? cloneElement(child, { field }) : child
   )
 
   return (
@@ -189,18 +189,18 @@ export const FormSubmit = ({ form: { isSubmitting } = {}, children, ...rest }) =
 )
 
 /**
- * Form — state controller HOC.
+ * withForm — state controller HOC.
  *
  * Creates a FormManager instance (once, via useRef) and bridges its
  * subscription-based state into React via useState + useEffect.
  *
- * Props:
+ * Props consumed by the HOC:
  *   config   {object}   — form field config (see createFormManager)
  *   submit   {function} — called with formatted values on successful submission;
  *                         may be async — isSubmitting will be true while it runs
  *   children            — composed FormField / FormSubmit tree
  */
-const Form = ({ config, submit, children }) => {
+const withForm = (WrappedComponent) => ({ config, submit, ...props }) => {
   const managerRef = useRef(null)
 
   if (!managerRef.current) {
@@ -238,12 +238,9 @@ const Form = ({ config, submit, children }) => {
     },
   }
 
-  return (
-    <FormDisplay form={form}>
-      {children}
-    </FormDisplay>
-  )
+  return <WrappedComponent form={form} {...props} />
 }
 
+const Form = withForm(FormDisplay)
 export default Form
 

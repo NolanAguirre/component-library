@@ -1,0 +1,28 @@
+.section {
+  margin-bottom: 2rem;
+}
+
+/* ── Title ───────────────────────────────────────────────── */
+
+.section__title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 0.75rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #374151;
+}
+
+/* ── Folds ───────────────────────────────────────────────── */
+
+.section__folds {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.section__fold {
+  display: contents;
+}

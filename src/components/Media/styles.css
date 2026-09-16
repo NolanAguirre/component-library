@@ -1,0 +1,99 @@
+/* ── Root ────────────────────────────────────────────────── */
+
+.media {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ── Image ───────────────────────────────────────────────── */
+
+.media__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.media--full .media__image {
+  object-fit: contain;
+}
+
+/* ── Video ───────────────────────────────────────────────── */
+
+.media__video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.media--full .media__video {
+  object-fit: contain;
+}
+
+/* ── Audio ───────────────────────────────────────────────── */
+
+.media__audio {
+  width: 100%;
+}
+
+/* ── Document ─────────────────────────────────────────────── */
+
+.media--document {
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.media__document-link {
+  padding: 0.625rem 1.25rem;
+  background: #f97316;
+  border-radius: 0.5rem;
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.media__document-link:hover {
+  background: #ea580c;
+}
+
+/* ── Placeholder ─────────────────────────────────────────── */
+
+.media__placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* ── Extension label ─────────────────────────────────────── */
+
+.media__extension {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* ── Overlay ─────────────────────────────────────────────── */
+
+.media__overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 1;
+  color: #ffffff;
+}
+
+.media__overlay svg {
+  width: 3rem;
+  height: 3rem;
+  filter: drop-shadow(0 0.125rem 0.5rem rgba(0, 0, 0, 0.4));
+}
+

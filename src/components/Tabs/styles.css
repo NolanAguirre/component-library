@@ -1,0 +1,49 @@
+/* ── Tabs ────────────────────────────────────────────────── */
+
+.tabs {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── TabList ─────────────────────────────────────────────── */
+
+.tabs__list {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid #374151;
+}
+
+/* ── Tab ─────────────────────────────────────────────────── */
+
+.tabs__tab {
+  padding: 0.625rem 1.25rem;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  background: none;
+  color: #9ca3af;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  border-radius: 6px 6px 0 0;
+}
+
+.tabs__tab:hover {
+  color: #e5e7eb;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.tabs__tab--active {
+  color: #93c5fd;
+  border-bottom-color: #2563eb;
+}
+
+/* ── TabPanel ────────────────────────────────────────────── */
+
+.tabs__panel {
+  padding: 1rem 0.25rem;
+  color: #d1d5db;
+  line-height: 1.6;
+}
+

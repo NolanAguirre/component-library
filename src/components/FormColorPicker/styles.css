@@ -1,0 +1,51 @@
+/* ── FormColorPicker ─────────────────────────────────────── */
+
+.form-color {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.form-color__input {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 2px solid #4b5563;
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+  padding: 0.125rem;
+  transition: border-color 0.15s ease;
+}
+
+.form-color__input:hover {
+  border-color: #6b7280;
+}
+
+.form-color__input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.form-color__input::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.form-color__input::-webkit-color-swatch {
+  border: none;
+  border-radius: 3px;
+}
+
+.form-color__input::-moz-color-swatch {
+  border: none;
+  border-radius: 3px;
+}
+
+.form-color__value {
+  font-size: 0.875rem;
+  font-family: monospace;
+  color: #9ca3af;
+}
+

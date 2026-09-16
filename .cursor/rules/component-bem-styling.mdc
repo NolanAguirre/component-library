@@ -1,55 +1,16 @@
 ---
 globs: src/components/**/styles.css
 ---
+
 # Component BEM Styling
 
-All component styles must use [BEM](https://getbem.com/) (Block Element Modifier) naming.
-
-## Structure
+BEM class names; blocks are reusable base classes, not unique-per-component.
 
 ```
-block               → the component root        (.card)
-block__element      → a part of the component   (.card__header)
-block--modifier     → a variant of the block    (.card--compact)
-block__element--modifier → a variant of an element (.fold__trigger--open)
+.block / .block__element / .block--modifier / .block__element--modifier
 ```
 
-## Rules
-
-- The **block** name matches the component's CSS class on its root element and is always **lowercase** (e.g. `card`, `fold`)
-- **Elements** are separated from the block with double underscore `__`
-- **Modifiers** are separated from the block or element with double dash `--`
-- Never use more than one level of element nesting — `block__element__sub` is **not** valid BEM; introduce a new element name instead
-- Class names are **kebab-case** only — no camelCase, no PascalCase
-
-## File Conventions
-
-- Each component has its own `styles.css`; styles are never shared across components
-- Group selectors inside the file by block → elements → modifiers, with a comment header for each group:
-
-```css
-/* ── Header ──────────────────────────────────────────────── */
-```
-
-## Reference Implementations
-
-- [src/components/Fold/styles.css](mdc:src/components/Fold/styles.css)
-- [src/components/Card/styles.css](mdc:src/components/Card/styles.css)
-
-## Examples
-
-```css
-/* ✅ correct */
-.card { }
-.card__header { }
-.card__section { }
-.card__label { }
-.card--compact { }
-.fold__trigger--open { }
-
-/* ❌ incorrect */
-.card__header__title { }   /* double nesting */
-.cardHeader { }            /* camelCase */
-.card_header { }           /* single underscore */
-.card-header { }           /* ambiguous — looks like a modifier separator */
-```
+- Reuse generic blocks (`.card`, not `.asset-card`). React provides identity; CSS provides the visual pattern. Prefer modifiers (`.card--compact`) over new blocks.
+- kebab-case only; no `block__element__sub`.
+- Each component owns its `styles.css` with additions only when reusing a base block. Import the base stylesheet if there are no additions.
+- Group selectors: block → elements → modifiers.

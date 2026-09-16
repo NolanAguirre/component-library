@@ -1,0 +1,43 @@
+/* ── GenericForm ─────────────────────────────────────────── */
+
+.generic-form .card__section {
+  padding: 0;
+}
+
+.generic-form .form {
+  width: 100%;
+}
+
+/* ── Actions ────────────────────────────────────────────── */
+
+.generic-form__actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+/* ── Cancel ─────────────────────────────────────────────── */
+
+.generic-form__cancel {
+  padding: 0.625rem 1.5rem;
+  background: transparent;
+  color: #d1d5db;
+  border: 1px solid #4b5563;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.generic-form__cancel:hover {
+  background: #1f2937;
+  border-color: #6b7280;
+}
+
+.generic-form__response {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 20rem;
+  overflow: auto;
+}

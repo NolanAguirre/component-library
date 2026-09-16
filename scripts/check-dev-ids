@@ -1,0 +1,55 @@
+#!/bin/sh
+# check-dev-ids <dir>...
+#
+# Static complement to the DevInspector runtime duplicate warning.
+# Collects every `<DevScope id="...">` and `devId="..."` string literal under
+# the given directories and exits non-zero when any id appears more than once.
+
+set -eu
+
+if [ "$#" -eq 0 ]; then
+  echo "usage: check-dev-ids <dir>..." >&2
+  exit 2
+fi
+
+tmp=$(mktemp)
+trap 'rm -f "$tmp"' EXIT INT TERM HUP
+tab=$(printf '\t')
+
+pattern='(<DevScope[^>]*[[:space:]]id|devId)[[:space:]]*=[[:space:]]*["'"'"'][^"'"'"']+["'"'"']'
+
+for dir in "$@"; do
+  if [ ! -d "$dir" ]; then
+    echo "check-dev-ids: not a directory: $dir" >&2
+    exit 2
+  fi
+  find "$dir" -type f \( -name '*.js' -o -name '*.jsx' -o -name '*.ts' -o -name '*.tsx' \) \
+    -not -path '*/node_modules/*' -not -path '*/dist/*' -not -path '*/build/*' \
+    -exec grep -Hno -E "$pattern" {} + 2>/dev/null \
+    | awk -v tab="$tab" '{
+        # input: file:line:<match ending in ="id"> ; emit: id<TAB>file:line
+        n = match($0, /=[[:space:]]*["'"'"'][^"'"'"']+["'"'"']$/)
+        if (n == 0) next
+        quoted = substr($0, n)
+        sub(/^=[[:space:]]*/, "", quoted)
+        id = substr(quoted, 2, length(quoted) - 2)
+        loc = substr($0, 1, n - 1)
+        sub(/:[^:]*$/, "", loc)
+        print id tab loc
+      }' >> "$tmp" || true
+done
+
+dups=$(cut -f1 "$tmp" | sort | uniq -d)
+
+if [ -z "$dups" ]; then
+  echo "check-dev-ids: $(wc -l < "$tmp" | tr -d ' ') ids, no duplicates"
+  exit 0
+fi
+
+echo "check-dev-ids: duplicate ids" >&2
+echo "$dups" | while IFS= read -r id; do
+  echo "" >&2
+  echo "  $id" >&2
+  awk -F "$tab" -v id="$id" '$1 == id { print "    " $2 }' "$tmp" >&2
+done
+exit 1

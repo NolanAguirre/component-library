@@ -1,0 +1,80 @@
+/* ── ProgressBar ─────────────────────────────────────────── */
+
+.progress {
+  width: 100%;
+}
+
+.progress__meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.progress__label {
+  font-size: 0.8125rem;
+  color: #d1d5db;
+}
+
+.progress__value {
+  font-size: 0.8125rem;
+  color: #9ca3af;
+  font-variant-numeric: tabular-nums;
+}
+
+.progress__track {
+  width: 100%;
+  height: 0.5rem;
+  border-radius: 0.25rem;
+  background: #374151;
+  overflow: hidden;
+}
+
+.progress__bar {
+  height: 100%;
+  border-radius: 0.25rem;
+  transition: width 0.2s ease;
+  background: #2563eb;
+}
+
+.progress--uploading .progress__bar {
+  background: #2563eb;
+}
+
+.progress--done .progress__bar {
+  background: #22c55e;
+}
+
+.progress--failed .progress__bar {
+  background: #ef4444;
+}
+
+/* ── Striped / animated ──────────────────────────────────── */
+
+.progress--striped .progress__bar {
+  background-image: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.15) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.15) 50%,
+    rgba(255, 255, 255, 0.15) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 1rem 1rem;
+}
+
+.progress--animated .progress__bar {
+  animation: progress-stripes 1s linear infinite;
+}
+
+@keyframes progress-stripes {
+  from {
+    background-position: 1rem 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}

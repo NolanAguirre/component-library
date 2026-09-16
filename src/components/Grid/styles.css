@@ -1,0 +1,42 @@
+.grid {
+  display: grid;
+  width: 100%;
+  gap: var(--grid-gap, 1rem);
+}
+
+.grid--fixed {
+  grid-template-columns: repeat(var(--grid-columns, 1), minmax(0, 1fr));
+}
+
+/* --grid-item-width carries the minItemWidth prop as an inline style, so apps
+   tweak the track from a class through --grid-min-item-width, which an inline
+   style would otherwise outrank. */
+.grid--auto {
+  grid-template-columns: repeat(auto-fill, minmax(var(--grid-min-item-width, var(--grid-item-width, 15rem)), 1fr));
+}
+
+/* display:grid so display:contents children (DevScope around Link, etc.) still stretch */
+.grid__item {
+  display: grid;
+  min-width: 0;
+}
+
+.grid__item > * {
+  min-width: 0;
+}
+
+.grid--sortable .grid__item,
+.grid--sortable .grid__item > * {
+  cursor: grab;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.grid__item--dragging {
+  z-index: 1;
+}
+
+.grid--sortable .grid__item--dragging,
+.grid--sortable .grid__item--dragging > * {
+  cursor: grabbing;
+}

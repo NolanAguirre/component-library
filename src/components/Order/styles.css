@@ -1,0 +1,51 @@
+/* ── Block ────────────────────────────────────────────────── */
+
+.order {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* ── Position ────────────────────────────────────────────── */
+
+.order__position {
+  min-width: 1.5rem;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #9ca3af;
+}
+
+/* ── Button ──────────────────────────────────────────────── */
+
+.order__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 1px solid #4b5563;
+  border-radius: 4px;
+  background: #1f2937;
+  color: #d1d5db;
+  font-size: 0.6rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.order__btn:hover:not(:disabled) {
+  background: #374151;
+  border-color: #6b7280;
+}
+
+.order__btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ── Button modifiers ────────────────────────────────────── */
+
+.order__btn--up { }
+
+.order__btn--down { }

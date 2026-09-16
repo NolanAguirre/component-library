@@ -1,0 +1,31 @@
+diff --git a/node_modules/@virtuoso.dev/masonry/dist/index.js b/node_modules/@virtuoso.dev/masonry/dist/index.js
+index 5b19708..755bb41 100644
+--- a/node_modules/@virtuoso.dev/masonry/dist/index.js
++++ b/node_modules/@virtuoso.dev/masonry/dist/index.js
+@@ -453,12 +453,20 @@ const zt = Nt(), Ft = Nt(), lt = v([], () => {
+       st,
+       Rt((e) => e.columns.some((n) => n.listBottom < n.viewportBottom))
+     ),
+-    (e) => {
+-      const n = e.columns.slice().sort((l, i) => l.listBottom - i.listBottom)[0], r = t.getValue(Y), o = r.flat(), s = o.length ? Math.max(...o) + 1 : 0;
+-      s >= t.getValue(D) || Kt(
+-        Y,
+-        r.map((l, i) => i === n.index ? [...l, s] : l)
+-      );
++    () => {
++      queueMicrotask(() => {
++        const e = t.getValue(st);
++        if (!e.columns.some((n2) => n2.listBottom < n2.viewportBottom))
++          return;
++        const n = e.columns.slice().sort((l, i) => l.listBottom - i.listBottom)[0], u2 = t.getValue(_t)[n.index];
++        if (u2 === void 0 || a(u2))
++          return;
++        const r = t.getValue(Y), o = r.flat(), s = o.length ? Math.max(...o) + 1 : 0;
++        s >= t.getValue(D) || t.pub(
++          Y,
++          r.map((l, i) => i === n.index ? [...l, s] : l)
++        );
++      });
+     }
+   );
+ }), ge = Dt(

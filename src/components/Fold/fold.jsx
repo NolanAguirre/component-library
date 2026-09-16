@@ -58,22 +58,19 @@ export const FoldContent = ({ fold: { isOpen } = {}, children }) => (
 )
 
 /**
- * Fold — state controller HOC.
+ * withFold — state controller HOC.
  *
- * Manages the open/closed state and delegates all rendering to FoldDisplay.
- * Accepts an optional `defaultOpen` prop to set the initial state.
+ * Manages the open/closed state and delegates all rendering to the wrapped
+ * display component. Accepts an optional `defaultOpen` prop to set the
+ * initial state.
  */
-const Fold = ({ defaultOpen = false, children }) => {
+const withFold = (WrappedComponent) => ({ defaultOpen = false, ...props }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen)
 
   const toggle = () => setIsOpen((prev) => !prev)
 
-  return (
-    <FoldDisplay isOpen={isOpen} toggle={toggle}>
-      {children}
-    </FoldDisplay>
-  )
+  return <WrappedComponent isOpen={isOpen} toggle={toggle} {...props} />
 }
 
+const Fold = withFold(FoldDisplay)
 export default Fold
-

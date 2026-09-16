@@ -1,0 +1,12 @@
+/* ── FormDate ────────────────────────────────────────────── */
+/* Uses .form__input base styles from Form/styles.css */
+
+.form__input--date {
+  color-scheme: dark;
+}
+
+.form__input--date::-webkit-calendar-picker-indicator {
+  filter: invert(0.7);
+  cursor: pointer;
+}
+

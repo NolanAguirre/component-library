@@ -1,0 +1,49 @@
+/* ── FormSearch ──────────────────────────────────────────── */
+
+.form-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.form-search__icon {
+  position: absolute;
+  left: 0.625rem;
+  font-size: 0.875rem;
+  pointer-events: none;
+}
+
+.form-search__input {
+  padding-left: 2.25rem;
+  padding-right: 2.25rem;
+}
+
+/* Hide the native search clear button */
+.form-search__input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.form-search__clear {
+  position: absolute;
+  right: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #6b7280;
+  cursor: pointer;
+  font-size: 0.75rem;
+  border-radius: 50%;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.form-search__clear:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #d1d5db;
+}
+

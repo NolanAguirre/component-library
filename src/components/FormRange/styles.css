@@ -1,0 +1,80 @@
+/* ── FormRange ───────────────────────────────────────────── */
+
+.form-range {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.form-range__input {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 0.375rem;
+  border-radius: 0.1875rem;
+  background: linear-gradient(
+    to right,
+    #2563eb 0%,
+    #2563eb var(--range-percent, 50%),
+    #4b5563 var(--range-percent, 50%),
+    #4b5563 100%
+  );
+  outline: none;
+  cursor: pointer;
+}
+
+.form-range__input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #2563eb;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease;
+}
+
+.form-range__input::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
+}
+
+.form-range__input::-moz-range-thumb {
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #2563eb;
+  cursor: pointer;
+}
+
+.form-range__value {
+  min-width: 2.5rem;
+  width: 4rem;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #93c5fd;
+  background: #1f2937;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #374151;
+  outline: none;
+}
+
+.form-range__value:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+}
+
+/* hide native number spinner arrows */
+.form-range__value::-webkit-outer-spin-button,
+.form-range__value::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.form-range__value[type='number'] {
+  -moz-appearance: textfield;
+}
+

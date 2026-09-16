@@ -1,0 +1,210 @@
+/* ── Dev inspector overlay ───────────────────────────────── */
+
+/* The root is non-interactive so the pointer reaches the page underneath and
+   elementFromPoint keeps resolving app elements; the docked panel opts back
+   into pointer events. */
+.dev-inspector {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  pointer-events: none;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+/* ── Outline over the hovered scope ──────────────────────── */
+
+.dev-inspector__outline {
+  position: fixed;
+  box-sizing: border-box;
+  border: 0.125rem solid #f59e0b;
+  background: rgba(245, 158, 11, 0.08);
+  border-radius: 0.125rem;
+  pointer-events: none;
+}
+
+/* ── Floating badge ──────────────────────────────────────── */
+
+.dev-inspector__badge {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  max-width: 32rem;
+  padding: 0.5rem 0.75rem;
+  background: #111827;
+  color: #e5e7eb;
+  border: 1px solid #374151;
+  border-radius: 0.375rem;
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.dev-inspector__badge--copied {
+  border-color: #10b981;
+}
+
+/* ── Docked panel ────────────────────────────────────────── */
+
+.dev-inspector__panel,
+.dev-inspector__toggle {
+  position: fixed;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  background: #111827;
+  color: #e5e7eb;
+  border: 1px solid #374151;
+  border-radius: 0.375rem;
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.5);
+  opacity: 0.9;
+  pointer-events: auto;
+}
+
+.dev-inspector__panel {
+  display: flex;
+  flex-direction: column;
+  min-width: min(14rem, calc(100vw - 1.5rem));
+  max-width: min(28rem, calc(100vw - 1.5rem));
+  max-height: calc(100dvh - 1.5rem);
+  overflow: hidden;
+}
+
+.dev-inspector__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  color: #9ca3af;
+  cursor: pointer;
+}
+
+.dev-inspector__panel:hover,
+.dev-inspector__toggle:hover,
+.dev-inspector__panel--dragging {
+  opacity: 1;
+}
+
+.dev-inspector__panel--dragging {
+  user-select: none;
+}
+
+.dev-inspector__panel-header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.375rem 0.25rem 0.25rem;
+}
+
+.dev-inspector__panel-title {
+  flex: 1;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.625rem;
+  white-space: nowrap;
+}
+
+.dev-inspector__panel-body {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  padding: 0.5rem 0.625rem;
+  border-top: 1px solid #374151;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.dev-inspector__action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  background: none;
+  color: #9ca3af;
+  border: 0;
+  border-radius: 0.1875rem;
+  cursor: pointer;
+}
+
+.dev-inspector__action:hover {
+  background: #1f2937;
+  color: #e5e7eb;
+}
+
+.dev-inspector__action--move {
+  cursor: grab;
+  touch-action: none;
+}
+
+.dev-inspector__action--move:active,
+.dev-inspector__panel--dragging .dev-inspector__action--move {
+  cursor: grabbing;
+}
+
+.dev-inspector__action--label {
+  padding: 0.125rem 0.375rem;
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.dev-inspector__action--on {
+  color: #fbbf24;
+}
+
+.dev-inspector__icon {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.dev-inspector__empty {
+  color: #6b7280;
+}
+
+/* ── Shared descriptor pieces ────────────────────────────── */
+
+.dev-inspector__route {
+  color: #9ca3af;
+  padding-bottom: 0.25rem;
+  margin-bottom: 0.125rem;
+  border-bottom: 1px solid #374151;
+}
+
+.dev-inspector__segment {
+  color: #fbbf24;
+}
+
+.dev-inspector__segment + .dev-inspector__segment {
+  padding-left: 0.75rem;
+}
+
+.dev-inspector__state {
+  color: #93c5fd;
+  margin-left: 0.375rem;
+}
+
+/* Off-screen textarea used for the insecure-context clipboard fallback. */
+.dev-inspector__clipboard {
+  position: fixed;
+  top: -100rem;
+  left: -100rem;
+  opacity: 0;
+}
+
+.dev-inspector__panel-body--form {
+  display: block;
+  box-sizing: border-box;
+  overscroll-behavior: contain;
+  width: min(26rem, calc(100vw - 3rem));
+  max-height: 65vh;
+  overflow: auto;
+  white-space: normal;
+}
+.dev-inspector__panel-header { flex-wrap: wrap; }
+.dev-inspector__action[aria-pressed="true"] { color: #f59e0b; }

@@ -1,0 +1,115 @@
+/* ── Root ────────────────────────────────────────────────── */
+
+.media-magnifier {
+  position: absolute;
+  inset: 0;
+  cursor: zoom-in;
+  user-select: none;
+}
+
+/* ── Lens ────────────────────────────────────────────────── */
+
+.media-magnifier__lens {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 0.125rem solid rgba(255, 255, 255, 0.85);
+  background-color: #000000;
+  pointer-events: auto;
+  cursor: grab;
+  /* Moved by transform so repositioning is a compositor job, not a repaint of
+     the scaled image. */
+  will-change: transform;
+}
+
+.media-magnifier__lens-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: none;
+  pointer-events: none;
+  transform-origin: 0 0;
+}
+
+.media-magnifier__lens--dragging {
+  cursor: grabbing;
+}
+
+.media-magnifier__lens--circle {
+  border-radius: 50%;
+}
+
+/* ── View ────────────────────────────────────────────────── */
+
+.media-magnifier__view {
+  position: absolute;
+  box-sizing: border-box;
+  border: 0.125rem dashed RGBA(255, 255, 255, 0.5);
+  pointer-events: none;
+  
+}
+
+.media-magnifier__view--circle {
+  border-radius: 50%;
+}
+
+/* ── Menu ────────────────────────────────────────────────── */
+
+.media-magnifier__menu {
+  position: fixed;
+  z-index: 1001;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.625rem;
+  border-radius: 0.375rem;
+  background: rgba(20, 20, 24, 0.95);
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.4);
+  pointer-events: auto;
+  cursor: default;
+}
+
+.media-magnifier__menu--flipped {
+  box-shadow: -0.5rem 0 1.5rem rgba(0, 0, 0, 0.4);
+}
+
+.media-magnifier__menu-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.media-magnifier__menu-field {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.media-magnifier__menu-label {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.75rem;
+}
+
+.media-magnifier__menu-input {
+  width: 4.5rem;
+  padding: 0.25rem 0.375rem;
+  border: 0.0625rem solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.25rem;
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  font-size: 0.8125rem;
+}
+
+/* ── Modifiers ───────────────────────────────────────────── */
+
+.media-magnifier--active {
+  cursor: crosshair;
+}
+
+.media-magnifier--locked {
+  cursor: crosshair;
+}

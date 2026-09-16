@@ -1,0 +1,7 @@
+.virtual-list__item {
+  min-width: 0;
+}
+
+.virtual-list__item > * {
+  min-width: 0;
+}

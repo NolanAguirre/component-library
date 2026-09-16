@@ -1,0 +1,144 @@
+/* ── Toast container ──────────────────────────────────────── */
+
+.toast {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 1100;
+  pointer-events: none;
+  max-width: 400px;
+  width: 100%;
+}
+
+/* ── Toast item ──────────────────────────────────────────── */
+
+.toast__item {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #374151;
+  background: #1f2937;
+  color: #e5e7eb;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  pointer-events: auto;
+  overflow: hidden;
+  animation: toast-slide-in 0.25s ease forwards;
+}
+
+@keyframes toast-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ── Type modifiers ──────────────────────────────────────── */
+
+.toast__item--success {
+  border-color: #166534;
+  background: #14532d;
+  color: #bbf7d0;
+}
+
+.toast__item--error {
+  border-color: #991b1b;
+  background: #7f1d1d;
+  color: #fecaca;
+}
+
+.toast__item--warning {
+  border-color: #92400e;
+  background: #78350f;
+  color: #fde68a;
+}
+
+.toast__item--info {
+  border-color: #1e3a5f;
+  background: #1e3a5f;
+  color: #93c5fd;
+}
+
+/* ── Icon ────────────────────────────────────────────────── */
+
+.toast__icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding-top: 0.0625rem;
+}
+
+.toast__type-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  display: block;
+}
+
+/* ── Message ─────────────────────────────────────────────── */
+
+.toast__message {
+  flex: 1;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+/* ── Close button ────────────────────────────────────────── */
+
+.toast__close {
+  flex-shrink: 0;
+  padding: 0.25rem;
+  margin: -0.125rem -0.25rem -0.125rem 0;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  color: inherit;
+  opacity: 0.6;
+  cursor: pointer;
+  transition: opacity 0.15s ease, background 0.15s ease;
+}
+
+.toast__close:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.toast__close-icon {
+  width: 1rem;
+  height: 1rem;
+  display: block;
+}
+
+/* ── Timer bar ───────────────────────────────────────────── */
+
+.toast__timer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  background: currentColor;
+  opacity: 0.35;
+  border-radius: 0 0 6px 6px;
+  animation: toast-timer-shrink linear forwards;
+  transform-origin: left;
+}
+
+@keyframes toast-timer-shrink {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+

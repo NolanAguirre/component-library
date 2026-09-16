@@ -1,0 +1,118 @@
+/* ── Tooltip wrapper ──────────────────────────────────────── */
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+/* ── Content ─────────────────────────────────────────────── */
+
+.tooltip__content {
+  position: absolute;
+  z-index: 1100;
+  padding: 0.5rem 0.75rem;
+  background: #1f2937;
+  color: #e5e7eb;
+  border: 1px solid #374151;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* ── Content modifiers ───────────────────────────────────── */
+
+/* Interactive content (e.g. click-triggered dropdowns) receives
+   pointer events and drops tooltip-style chrome. */
+.tooltip__content--interactive {
+  pointer-events: auto;
+  padding: 0;
+  background: none;
+  border: none;
+  box-shadow: none;
+  white-space: normal;
+}
+
+/* ── Placement modifiers ─────────────────────────────────── */
+
+/* Top row — content sits above the trigger */
+.tooltip__content--top-left {
+  bottom: 100%;
+  left: 0;
+  margin-bottom: 0.5rem;
+}
+
+.tooltip__content--top-center {
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 0.5rem;
+}
+
+.tooltip__content--top-right {
+  bottom: 100%;
+  right: 0;
+  margin-bottom: 0.5rem;
+}
+
+/* Bottom row — content sits below the trigger */
+.tooltip__content--bottom-left {
+  top: 100%;
+  left: 0;
+  margin-top: 0.5rem;
+}
+
+.tooltip__content--bottom-center {
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 0.5rem;
+}
+
+.tooltip__content--bottom-right {
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+}
+
+/* Left column — content sits to the left of the trigger */
+.tooltip__content--left-top {
+  right: 100%;
+  top: 0;
+  margin-right: 0.5rem;
+}
+
+.tooltip__content--left-center {
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-right: 0.5rem;
+}
+
+.tooltip__content--left-bottom {
+  right: 100%;
+  bottom: 0;
+  margin-right: 0.5rem;
+}
+
+/* Right column — content sits to the right of the trigger */
+.tooltip__content--right-top {
+  left: 100%;
+  top: 0;
+  margin-left: 0.5rem;
+}
+
+.tooltip__content--right-center {
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 0.5rem;
+}
+
+.tooltip__content--right-bottom {
+  left: 100%;
+  bottom: 0;
+  margin-left: 0.5rem;
+}

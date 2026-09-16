@@ -1,0 +1,37 @@
+/* ── Badge group ─────────────────────────────────────────── */
+
+.badge-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* ── Elements ────────────────────────────────────────────── */
+
+.badge-group__label {
+  color: #9ca3af;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-group__items {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* ── Sizes ───────────────────────────────────────────────── */
+
+.badge-group--small .badge-group__items {
+  gap: 0.375rem;
+}
+
+.badge-group--medium .badge-group__items {
+  gap: 0.5rem;
+}
+
+.badge-group--large .badge-group__items {
+  gap: 0.75rem;
+}

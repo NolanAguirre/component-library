@@ -1,21 +1,21 @@
 .row {
   display: flex;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #374151;
   border-radius: 8px;
   overflow: hidden;
-  background: #ffffff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  background: #1f2937;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 /* ── Header ──────────────────────────────────────────────── */
 
 .row__header {
   padding: 0.65rem 1.25rem;
-  background: #f9fafb;
-  border-right: 1px solid #e5e7eb;
+  background: #111827;
+  border-right: 1px solid #374151;
   font-size: 1.05rem;
   font-weight: 600;
-  color: #111827;
+  color: #f9fafb;
   display: flex;
   align-items: center;
   white-space: nowrap;
@@ -25,9 +25,9 @@
 
 .row__section {
   padding: 0.65rem 1.25rem;
-  color: #374151;
+  color: #d1d5db;
   line-height: 1.5;
-  border-right: 1px solid #f3f4f6;
+  border-right: 1px solid #374151;
 }
 
 .row__section:last-child {
@@ -45,4 +45,3 @@
   text-transform: uppercase;
   color: #6b7280;
 }
-

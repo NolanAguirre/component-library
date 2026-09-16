@@ -4,34 +4,21 @@ alwaysApply: true
 
 # Component State/Display Separation
 
-Components that manage state must be split into two distinct layers:
+Stateful components split into:
 
-| Layer | Responsibility |
-|---|---|
-| **Display controller** | Pure rendering — receives state as props, no `useState` |
-| **State controller (HOC)** | Owns state via `useState`, wraps the display controller |
+- **Display** — named export, pure props, no `useState`
+- **State HOC** — `withX(WrappedComponent)`, owns state; default export is `withX(XDisplay)`
 
-## Pattern
+Both live in the same file. Stateless components need no split. Display controllers clone children to inject props rather than rendering fixed subtrees.
 
 ```jsx
-// Display controller — pure, stateless
 export const FoldDisplay = ({ isOpen, toggle, children }) => { ... }
 
-// State controller HOC — owns state, delegates rendering
-const Fold = ({ defaultOpen = false, children }) => {
+const withFold = (WrappedComponent) => ({ defaultOpen = false, ...props }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen)
   const toggle = () => setIsOpen((prev) => !prev)
-  return <FoldDisplay isOpen={isOpen} toggle={toggle}>{children}</FoldDisplay>
+  return <WrappedComponent isOpen={isOpen} toggle={toggle} {...props} />
 }
-export default Fold
+
+export default withFold(FoldDisplay)
 ```
-
-## Rules
-
-- Components with **no state** do not need this separation — a single stateless component is sufficient
-- The display controller is **always a named export** so it can be used standalone when external state is needed
-- The state controller HOC is the **default export** and is the primary consumer-facing API
-- Both must live in the same file
-- The design is based around **passing children and cloning them** to allow composition in JSX — display controllers use `React.cloneElement` to curry props into children rather than rendering fixed sub-components directly
-
-See [src/components/Fold/fold.jsx](mdc:src/components/Fold/fold.jsx) for the reference implementation.

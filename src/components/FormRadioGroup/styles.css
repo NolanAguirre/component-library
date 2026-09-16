@@ -1,0 +1,61 @@
+/* ── RadioGroup ──────────────────────────────────────────── */
+
+.form-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* ── Radio ───────────────────────────────────────────────── */
+
+.form-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9375rem;
+  color: #d1d5db;
+}
+
+.form-radio__input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.form-radio__indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid #4b5563;
+  border-radius: 50%;
+  background: #1f2937;
+  transition: border-color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.form-radio__indicator::after {
+  content: '';
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: #2563eb;
+  transform: scale(0);
+  transition: transform 0.15s ease;
+}
+
+.form-radio--checked .form-radio__indicator {
+  border-color: #2563eb;
+}
+
+.form-radio--checked .form-radio__indicator::after {
+  transform: scale(1);
+}
+
+.form-radio__label {
+  user-select: none;
+}
+

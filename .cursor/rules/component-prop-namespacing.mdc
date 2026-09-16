@@ -4,38 +4,28 @@ alwaysApply: true
 
 # Component Prop Namespacing
 
-When a display controller clones its children (via `React.cloneElement`) to pass
-props down, all injected props **must be grouped under a single object key named
-after the component** (lowercase).
-
-## Rule
-
-```
-cloneElement(child, { <componentName>: { ...props } })
-```
-
-## Example — Fold
-
-`FoldDisplay` injects `isOpen` and `toggle` under the `fold` key:
+Injected child props go under one lowercase key named for the component:
 
 ```jsx
-// ✅ correct
 cloneElement(child, { fold: { isOpen, toggle } })
+// not: cloneElement(child, { isOpen, toggle })
 
-// ❌ incorrect — props are spread at the top level
-cloneElement(child, { isOpen, toggle })
+const FoldTrigger = ({ fold: { isOpen, toggle } = {}, children }) => ...
 ```
 
-Child components destructure from that namespaced key:
+## Exception: data templates
+
+Components that iterate a data collection into a template child (`Grid`,
+`VirtualGrid`, `Masonry`, `Map`) inject the datum as top-level `item` and
+`index` props instead. This is one shared contract, so the same card template
+works under any of them:
 
 ```jsx
-// ✅ correct
-const FoldTrigger = ({ fold: { isOpen, toggle } = {}, children }) => ...
-const FoldContent = ({ fold: { isOpen } = {}, children }) => ...
+cloneElement(child, { item, index })
+
+const Card = ({ item, index }) => ...
 ```
 
-This keeps the prop surface of each child unambiguous and prevents collisions
-when components are nested or composed together.
-
-See [src/components/Fold/fold.jsx](mdc:src/components/Fold/fold.jsx) for the
-reference implementation.
+This applies only to the iterated datum. Controller/context injection
+(`fold`, `mediaLightbox`, `multiSelect`, `tabs`, `viewSwitch`, `minimap`)
+stays namespaced, including on these same components.

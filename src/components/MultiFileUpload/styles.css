@@ -1,0 +1,52 @@
+/* ── MultiFileUpload ─────────────────────────────────────── */
+
+.form-file--multi {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.form-file__zone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 5rem;
+  padding: 1rem;
+  border: 2px dashed #4b5563;
+  border-radius: 6px;
+  background: #1f2937;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.form-file__zone:hover {
+  border-color: #6b7280;
+}
+
+.form-file__zone--drag-over {
+  border-color: #2563eb;
+  background: rgba(37, 99, 235, 0.08);
+}
+
+.form-file__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-file__clear {
+  align-self: flex-start;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 3px;
+  border: 1px solid #4b5563;
+  background: transparent;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.form-file__clear:hover {
+  background: #374151;
+  color: #e5e7eb;
+}

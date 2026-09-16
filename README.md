@@ -9,3 +9,5 @@ The component design is based around passing in children and cloning them to all
 Each component needs to be factored into either control state or control display. The state controller is meant to be a HOC that can wrap the display controller to form a usable component while keeping the state management and display independant.
 
 All props passed down to children need to be in an object named for the component, for example the Fold component should have toggle and isOpen under the form key like form:{toggle, isOpen}
+
+This repo is not meant to be mono-repo specific, its mean to support generic use-case.
