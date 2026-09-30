@@ -1,0 +1,41 @@
+/* ── ScrollingText ───────────────────────────────────────── */
+
+.scrolling-text {
+  display: block;
+  overflow: hidden;
+  min-width: 0;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.scrolling-text__track {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  width: max-content;
+}
+
+.scrolling-text--active .scrolling-text__track {
+  gap: var(--scrolling-text-gap, 48px);
+  animation: scrolling-text-x var(--scrolling-text-duration, 8s) linear infinite;
+}
+
+.scrolling-text__copy {
+  flex: none;
+  white-space: nowrap;
+}
+
+@keyframes scrolling-text-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(var(--scrolling-text-distance, 0px) * -1));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scrolling-text--active .scrolling-text__track {
+    animation: none;
+  }
+}

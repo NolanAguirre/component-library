@@ -1,0 +1,137 @@
+.tree-view {
+  position: relative;
+  height: 100%;
+  min-height: 0;
+  outline: none;
+  color: var(--tree-color, #e5e7eb);
+  font-size: var(--tree-font-size, 13px);
+  line-height: 1;
+  user-select: none;
+}
+
+.tree-view__scroller {
+  outline: none;
+}
+
+.tree-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: var(--tree-row-height, 22px);
+  box-sizing: border-box;
+  padding-right: 8px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.tree-row:hover {
+  background: var(--tree-row-hover-bg, rgba(255, 255, 255, 0.05));
+}
+
+.tree-row__chevron {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: var(--tree-chevron-color, #9ca3af);
+  transition: transform 0.12s ease;
+}
+
+.tree-row__chevron-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.tree-row__spinner {
+  width: 9px;
+  height: 9px;
+  box-sizing: border-box;
+  border: 1.5px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: tree-row-spin 0.7s linear infinite;
+}
+
+.tree-row__icon {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.tree-row__label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: normal;
+}
+
+.tree-row__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: calc(var(--tree-row-height, 22px) - 4px);
+  box-sizing: border-box;
+  padding: 0 4px;
+  border: 1px solid var(--tree-input-border, #2563eb);
+  border-radius: 2px;
+  outline: none;
+  background: var(--tree-input-bg, #111827);
+  color: inherit;
+  font: inherit;
+  user-select: text;
+}
+
+.tree-row__trailing {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  color: #9ca3af;
+}
+
+.tree-row--selected {
+  background: var(--tree-row-selected-bg, #374151);
+}
+
+.tree-row--selected:hover {
+  background: var(--tree-row-selected-bg, #374151);
+}
+
+.tree-view:focus-within .tree-row--selected {
+  background: var(--tree-row-selected-focus-bg, rgba(37, 99, 235, 0.35));
+}
+
+.tree-view:focus-within .tree-row--focused {
+  border-color: var(--tree-row-focus-border, #2563eb);
+}
+
+.tree-row--muted .tree-row__label,
+.tree-row--muted .tree-row__icon {
+  opacity: 0.55;
+}
+
+.tree-row--editing {
+  cursor: default;
+}
+
+.tree-row--loading .tree-row__chevron {
+  color: var(--tree-chevron-loading-color, #93c5fd);
+}
+
+.tree-row__chevron--leaf {
+  visibility: hidden;
+}
+
+.tree-row__chevron--expanded {
+  transform: rotate(90deg);
+}
+
+@keyframes tree-row-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

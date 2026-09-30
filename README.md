@@ -2,6 +2,19 @@
 
 This repo is a set of common components that are meant to be interoperable.
 
+## Install and start
+
+Requires Node.js 18+.
+
+```sh
+make install
+make start
+```
+
+`make install` runs `npm install`. `make start` runs the Vite dev server (`npm run dev`). The storyboard app is then available at http://localhost:5173.
+
+Optional: copy `.env.example` to `.env` and set `VITE_LOCAL_BROWSER_BASE` if you want LocalBrowser to strip a path prefix from absolute paths.
+
 Each component lives in /src/components/<Component-name> and each component has its own style file.
 
 The component design is based around passing in children and cloning them to allow currying of components in HTML.

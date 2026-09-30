@@ -1,0 +1,10 @@
+.background-split { display: flex; flex-direction: column; gap: 0.6rem; padding-top: 0.75rem; border-top: 1px solid #404040; font-size: 0.8125rem; }
+.background-split p { margin: 0; color: #a3a3a3; }
+.background-split fieldset { display: flex; flex-direction: column; gap: 0.6rem; border: 0; padding: 0; margin: 0; min-width: 0; }
+.background-split label, .background-split__color { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.background-split input[type="number"] { width: 4rem; margin-left: auto; }
+.background-split input[type="range"] { width: 100%; }
+.background-split input[type="number"], .background-split select, .background-split button { background: #262626; color: #fafafa; border: 1px solid #404040; border-radius: 4px; padding: 0.35rem; }
+.background-split button { cursor: pointer; }
+.background-split button:disabled { cursor: default; opacity: 0.5; }
+.background-split__preview { display: block; width: 100%; height: auto; margin-bottom: 0.5rem; background: repeating-conic-gradient(#333 0% 25%, #444 0% 50%) 0 0 / 16px 16px; }

@@ -366,6 +366,10 @@ const DevInspectorPanel = ({
   const segments = descriptor ? descriptor.segments : []
   const activeForm = forms.find(form => form.id === activeFormId)
   const View = activeForm?.view
+  const inspector = {
+    descriptor, pinned, collapsed, latched, copied, dragging, position, modifier,
+    activeFormId, close: () => onSelectForm(null),
+  }
 
   if (collapsed) {
     return (
@@ -442,7 +446,10 @@ const DevInspectorPanel = ({
         </button>
       </div>
       <div className={`dev-inspector__panel-body${activeForm ? ' dev-inspector__panel-body--form' : ''}`}>
-        {View ? <View key={activeForm.id} {...activeForm.props} inspector={{ descriptor, close: () => onSelectForm(null) }} /> : activeForm ? <GenericForm key={activeForm.id} {...activeForm} /> : segments.length === 0 ? (
+        {View ? <View key={activeForm.id} {...activeForm.props} inspector={inspector} /> : activeForm ? (
+          <GenericForm key={activeForm.id} {...activeForm}
+            componentProps={{ ...activeForm.componentProps, inspector }} />
+        ) : segments.length === 0 ? (
           <span className="dev-inspector__empty">
             {latched ? 'tap a scope' : `hold ${modifier} or tap Dev`}
           </span>

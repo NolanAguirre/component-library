@@ -1,0 +1,62 @@
+
+/* ── StatusBar ───────────────────────────────────────────── */
+
+.status-bar {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: stretch;
+  height: var(--status-bar-height, 22px);
+  padding: 0 4px;
+  overflow: hidden;
+  background: var(--status-bar-bg, #1f2937);
+  border-top: 1px solid var(--status-bar-border, #374151);
+  color: var(--status-bar-fg, #e5e7eb);
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+.status-bar__group {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.status-bar__spacer {
+  flex: 1 1 auto;
+}
+
+.status-bar__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  padding: 0 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Modifiers ───────────────────────────────────────────── */
+
+.status-bar__group--right {
+  flex-shrink: 0;
+}
+
+.status-bar__item--action {
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.status-bar__item--action:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.status-bar__item--action:focus-visible {
+  outline: 1px solid var(--status-bar-accent, #2563eb);
+  outline-offset: -1px;
+}

@@ -1,0 +1,16 @@
+.file-icon {
+  display: inline-block;
+  flex: none;
+  vertical-align: middle;
+}
+
+.file-icon__badge {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 6px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.file-icon--folder {
+  color: var(--folder-icon-color, #7ba4d4);
+}

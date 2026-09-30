@@ -1,26 +1,6 @@
 import { useState, useEffect, useRef, Children, cloneElement } from 'react'
+import { fuzzyScore } from '../../lib/fuzzyScore'
 import './styles.css'
-
-const fuzzyScore = (text, query) => {
-  const haystack = text.toLowerCase()
-  const needle = query.toLowerCase()
-  let score = 0
-  let searchFrom = 0
-  let previousMatch = -2
-
-  for (const char of needle) {
-    const matchIndex = haystack.indexOf(char, searchFrom)
-    if (matchIndex === -1) return null
-
-    score += matchIndex === previousMatch + 1 ? 2 : 1
-    score -= matchIndex * 0.01
-
-    previousMatch = matchIndex
-    searchFrom = matchIndex + 1
-  }
-
-  return score
-}
 
 // searchValue lets an option render a node as its displayValue and still be filterable
 const optionText = (option) => String(option.searchValue ?? option.displayValue ?? option.value ?? '')

@@ -21,6 +21,9 @@ import Drawer from './components/Drawer/drawer'
 import LocalBrowser, { LocalBrowserOverlay } from './components/LocalBrowser/localBrowser'
 import Map from './components/Map/map'
 import VirtualList from './components/VirtualList/virtualList'
+import TreeView, { TreeRow } from './components/TreeView/treeView'
+import ContextMenu from './components/ContextMenu/contextMenu'
+import FileIcon, { FolderIcon } from './components/FileIcon/fileIcon'
 import Pagination from './components/Pagination/pagination'
 import ProgressBar from './components/ProgressBar/progressBar'
 import Skeleton from './components/Skeleton/skeleton'
@@ -28,6 +31,10 @@ import Select from './components/Select/select'
 import UploadFileRow from './components/UploadFileRow/uploadFileRow'
 import Button from './components/Button/button'
 import Tabs, { TabList, Tab, TabPanel } from './components/Tabs/tabs'
+import CodeEditor from './components/CodeEditor/codeEditor'
+import SplitPane from './components/SplitPane/splitPane'
+import TabStrip from './components/TabStrip/tabStrip'
+import StatusBar, { StatusBarItem } from './components/StatusBar/statusBar'
 import Canvas, { CanvasSurface, CanvasMinimap, CanvasControls } from './components/Canvas/canvas'
 import Timeline from './components/Timeline/timeline'
 import Masonry from './components/Masonry/masonry'
@@ -1263,6 +1270,227 @@ const VirtualListDemo = () => (
   </DevScope>
 )
 
+const FAKE_FS = {
+  '': [
+    { name: 'src', type: 'dir' },
+    { name: 'public', type: 'dir' },
+    { name: 'db', type: 'dir' },
+    { name: '.env' },
+    { name: '.gitignore' },
+    { name: 'Dockerfile' },
+    { name: 'Makefile' },
+    { name: 'README.md' },
+    { name: 'package.json' },
+    { name: 'package-lock.json' },
+  ],
+  src: [
+    { name: 'components', type: 'dir' },
+    { name: 'App.jsx' },
+    { name: 'main.jsx' },
+    { name: 'index.css' },
+    { name: 'api.ts' },
+  ],
+  'src/components': [
+    { name: 'Editor.tsx' },
+    { name: 'FileTree.jsx' },
+    { name: 'styles.scss' },
+  ],
+  public: [
+    { name: 'favicon.ico' },
+    { name: 'index.html' },
+    { name: 'logo.svg' },
+  ],
+  db: [
+    { name: 'deploy', type: 'dir' },
+    { name: 'sqitch.plan' },
+  ],
+  'db/deploy': [
+    { name: 'v1.000.0.sql' },
+  ],
+}
+
+const treeParentOf = (path) => (path.includes('/') ? path.slice(0, path.lastIndexOf('/')) : '')
+const treeJoin = (dir, name) => (dir ? `${dir}/${name}` : name)
+const treeIsWithin = (path, root) => path === root || path.startsWith(`${root}/`)
+const treeSort = (entries) => [...entries].sort((a, b) =>
+  a.type === b.type ? a.name.localeCompare(b.name) : a.type === 'dir' ? -1 : 1)
+const fakeListing = (dir) => treeSort(
+  (FAKE_FS[dir] ?? []).map(({ name, type = 'file' }) => ({ path: treeJoin(dir, name), name, type })),
+)
+
+const TreeViewDemoRow = ({ item, tree, editingId, commitRename, cancelRename }) => (
+  <TreeRow
+    item={item}
+    tree={tree}
+    muted={item.name.startsWith('.')}
+    editing={editingId === item.path}
+    commitEdit={(value) => commitRename(item, value)}
+    cancelEdit={cancelRename}
+  />
+)
+
+const TreeViewDemoPanel = ({ contextMenu: { open } = {}, children }) => (
+  <div
+    style={{
+      height: '20rem',
+      width: '18rem',
+      padding: '4px 0',
+      background: '#111827',
+      border: '1px solid #374151',
+      borderRadius: '6px',
+      textAlign: 'left',
+    }}
+    onContextMenu={(event) => open?.(event, null)}
+  >
+    {children(open)}
+  </div>
+)
+
+const TreeViewDemo = () => {
+  const [listing, setListing] = useState(() => ({ '': fakeListing('') }))
+  const [expandedIds, setExpandedIds] = useState(['src'])
+  const [selectedId, setSelectedId] = useState(null)
+  const [editingId, setEditingId] = useState(null)
+  const [log, setLog] = useState('Right-click a row or the empty area. F2 renames, Delete removes.')
+
+  const loadChildren = (item) => new Promise((resolve) => {
+    setTimeout(() => {
+      setListing((prev) => (prev[item.path] ? prev : { ...prev, [item.path]: fakeListing(item.path) }))
+      resolve()
+    }, 700)
+  })
+
+  const newFile = (target) => {
+    const dir = target ? (target.type === 'dir' ? target.path : treeParentOf(target.path)) : ''
+    const entries = listing[dir] ?? fakeListing(dir)
+    let count = 1
+    while (entries.some((entry) => entry.name === `untitled-${count}.txt`)) count += 1
+    const name = `untitled-${count}.txt`
+    const entry = { path: treeJoin(dir, name), name, type: 'file' }
+    setListing((prev) => ({ ...prev, [dir]: treeSort([...(prev[dir] ?? fakeListing(dir)), entry]) }))
+    if (dir && !expandedIds.includes(dir)) setExpandedIds([...expandedIds, dir])
+    setSelectedId(entry.path)
+    setEditingId(entry.path)
+    setLog(`created ${entry.path}`)
+  }
+
+  const commitRename = (item, value) => {
+    setEditingId(null)
+    const name = value.trim()
+    if (!name || name === item.name || name.includes('/')) return
+    const dir = treeParentOf(item.path)
+    const nextPath = treeJoin(dir, name)
+    if ((listing[dir] ?? []).some((entry) => entry.path === nextPath)) {
+      setLog(`${name} already exists`)
+      return
+    }
+    const move = (path) => (treeIsWithin(path, item.path) ? nextPath + path.slice(item.path.length) : path)
+    setListing((prev) => Object.fromEntries(Object.entries(prev).map(([key, entries]) => [
+      key ? move(key) : key,
+      treeSort(entries.map((entry) => ({
+        ...entry,
+        path: move(entry.path),
+        name: entry.path === item.path ? name : entry.name,
+      }))),
+    ])))
+    setExpandedIds((prev) => prev.map(move))
+    setSelectedId(nextPath)
+    setLog(`renamed ${item.path} → ${nextPath}`)
+  }
+
+  const remove = (item) => {
+    const dir = treeParentOf(item.path)
+    setListing((prev) => {
+      const next = Object.fromEntries(Object.entries(prev).filter(([key]) => !(key && treeIsWithin(key, item.path))))
+      next[dir] = (next[dir] ?? []).filter((entry) => entry.path !== item.path)
+      return next
+    })
+    setExpandedIds((prev) => prev.filter((id) => !treeIsWithin(id, item.path)))
+    if (selectedId && treeIsWithin(selectedId, item.path)) setSelectedId(null)
+    setLog(`deleted ${item.path}`)
+  }
+
+  const menuItems = (item) => [
+    { id: 'new-file', label: 'New File', run: newFile },
+    { separator: true },
+    { id: 'rename', label: 'Rename', shortcut: 'F2', disabled: !item, run: (target) => setEditingId(target.path) },
+    { id: 'delete', label: 'Delete', shortcut: 'Del', danger: true, disabled: !item, run: remove },
+  ]
+
+  const handleKeyDown = (event, item) => {
+    if (!item) return
+    if (event.key === 'F2') {
+      event.preventDefault()
+      setEditingId(item.path)
+    } else if (event.key === 'Delete') {
+      event.preventDefault()
+      remove(item)
+    }
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.75rem' }}>
+      <ContextMenu items={menuItems} devId="qmvyuxd">
+        <TreeViewDemoPanel>
+          {(openMenu) => (
+            <TreeView
+              roots={listing['']}
+              getId={(item) => item.path}
+              getChildren={(item) => listing[item.path]}
+              isBranch={(item) => item.type === 'dir'}
+              loadChildren={loadChildren}
+              expandedIds={expandedIds}
+              onExpandedChange={setExpandedIds}
+              selectedId={selectedId}
+              onSelect={(item) => setSelectedId(item.path)}
+              open={(item) => setLog(`open ${item.path}`)}
+              onRowContextMenu={(event, item) => openMenu?.(event, item)}
+              onKeyDown={handleKeyDown}
+              devId="ty3as1v"
+            >
+              <TreeViewDemoRow
+                editingId={editingId}
+                commitRename={commitRename}
+                cancelRename={() => setEditingId(null)}
+              />
+            </TreeView>
+          )}
+        </TreeViewDemoPanel>
+      </ContextMenu>
+      <span style={{ color: '#9ca3af', fontSize: '0.85rem' }}>{log}</span>
+    </div>
+  )
+}
+
+const FILE_ICON_SAMPLES = [
+  'index.js', 'App.jsx', 'main.ts', 'Editor.tsx', 'package.json', 'styles.css',
+  'theme.scss', 'index.html', 'README.md', 'main.py', 'server.go', 'lib.rs',
+  'build.sh', 'Makefile', 'Dockerfile', 'config.yml', 'Cargo.toml', 'schema.sql',
+  'photo.png', 'logo.svg', 'yarn.lock', '.env', '.gitignore', 'notes.txt',
+]
+
+const FILE_ICON_CHIP = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.5rem',
+  color: '#d1d5db',
+  fontSize: '0.85rem',
+}
+
+const FileIconGallery = () => (
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(10rem, 1fr))', gap: '0.75rem', textAlign: 'left' }}>
+    <span style={FILE_ICON_CHIP}><FolderIcon /><FolderIcon size={32} /> folder</span>
+    <span style={FILE_ICON_CHIP}><FolderIcon open /><FolderIcon open size={32} /> folder (open)</span>
+    {FILE_ICON_SAMPLES.map((name) => (
+      <span key={name} style={FILE_ICON_CHIP}>
+        <FileIcon name={name} />
+        <FileIcon name={name} size={32} />
+        {name}
+      </span>
+    ))}
+  </div>
+)
+
 const MAP_ITEMS = Array.from({ length: 6 }, (_, index) => ({
   id: `map-${index}`,
   label: `Item ${index + 1}`,
@@ -1388,6 +1616,324 @@ const DevInspectorDemo = () => {
           </DevScope>
         </div>
       </DevScope>
+    </DevScope>
+  )
+}
+
+const EDITOR_DEMO_DOCS = {
+  'demo/app.js': {
+    filename: 'app.js',
+    label: 'app.js',
+    badge: 'JS',
+    color: '#facc15',
+    text: [
+      "import { useState } from 'react'",
+      '',
+      ...Array.from({ length: 40 }, (_, i) => [
+        `export const handler${i + 1} = (input) => {`,
+        `  const value = input * ${i + 1}`,
+        '  return value',
+        '}',
+        '',
+      ]).flat(),
+    ].join('\n'),
+  },
+  'demo/styles.css': {
+    filename: 'styles.css',
+    label: 'styles.css',
+    badge: '#',
+    color: '#60a5fa',
+    text: Array.from({ length: 30 }, (_, i) => [
+      `.block-${i + 1} {`,
+      `  padding: ${i + 1}px;`,
+      '  color: #e5e7eb;',
+      '}',
+      '',
+    ].join('\n')).join('\n'),
+  },
+  'demo/README.md': {
+    filename: 'README.md',
+    label: 'README.md',
+    badge: 'M',
+    color: '#9ca3af',
+    text: '# Demo\n\nEach document keeps its own **undo history**, selection and scroll.\n\n- Edit one doc\n- Switch to another\n- Come back and press Mod-Z\n',
+  },
+}
+
+const EDITOR_DEMO_IDS = Object.keys(EDITOR_DEMO_DOCS)
+
+const editorDemoTexts = () =>
+  Object.fromEntries(EDITOR_DEMO_IDS.map((id) => [id, EDITOR_DEMO_DOCS[id].text]))
+
+const EditorDemoBadge = ({ id }) => (
+  <span style={{ color: EDITOR_DEMO_DOCS[id].color, fontSize: 10, fontWeight: 700 }}>
+    {EDITOR_DEMO_DOCS[id].badge}
+  </span>
+)
+
+const formatCursor = ({ line, col, selected }) =>
+  `Ln ${line}, Col ${col}${selected ? ` (${selected} selected)` : ''}`
+
+const CodeEditorDemo = () => {
+  const [activeId, setActiveId] = useState(EDITOR_DEMO_IDS[0])
+  const [texts, setTexts] = useState(editorDemoTexts)
+  const [readOnly, setReadOnly] = useState(false)
+  const [cursor, setCursor] = useState({ line: 1, col: 1, selected: 0 })
+
+  const reload = () => setTexts((prev) => ({
+    ...prev,
+    [activeId]: `// reloaded from disk at ${new Date().toLocaleTimeString()}\n${EDITOR_DEMO_DOCS[activeId].text}`,
+  }))
+
+  return (
+    <DevScope id="3339n8k" state={{ activeId, readOnly }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', textAlign: 'left' }}>
+        <p style={{ margin: 0, color: '#9ca3af', fontSize: '0.875rem' }}>
+          Edit and scroll a doc, switch to another, then come back: undo history, selection and scroll are kept per doc.
+          "Simulate reload" pushes an external value change.
+        </p>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+          {EDITOR_DEMO_IDS.map((id) => (
+            <Button
+              key={id}
+              devId="92tw48t"
+              size="sm"
+              variant={id === activeId ? 'primary' : 'secondary'}
+              onClick={() => setActiveId(id)}
+            >
+              {EDITOR_DEMO_DOCS[id].label}
+            </Button>
+          ))}
+          <Button devId="uimac54" size="sm" variant="ghost" onClick={() => setReadOnly((prev) => !prev)}>
+            {readOnly ? 'Read-only: on' : 'Read-only: off'}
+          </Button>
+          <Button devId="tedwczj" size="sm" variant="ghost" onClick={reload}>
+            Simulate reload
+          </Button>
+        </div>
+        <div style={{ height: 320, border: '1px solid #374151' }}>
+          <CodeEditor
+            docId={activeId}
+            value={texts[activeId]}
+            filename={EDITOR_DEMO_DOCS[activeId].filename}
+            readOnly={readOnly}
+            onChange={(value, id) => setTexts((prev) => ({ ...prev, [id]: value }))}
+            onCursorChange={setCursor}
+            devId="9fbjorz"
+          />
+        </div>
+        <DevScope id="u8b9e57">
+          <span style={{ color: '#9ca3af', fontSize: '0.8125rem' }}>{formatCursor(cursor)}</span>
+        </DevScope>
+      </div>
+    </DevScope>
+  )
+}
+
+const SplitPaneDemo = () => (
+  <DevScope id="ikuqr2f">
+    <div style={{ height: 280, border: '1px solid #374151', textAlign: 'left' }}>
+      <SplitPane defaultSize={200} minSize={120} maxSize={400} storageKey="component-library.demo.split-pane" devId="vtbdo3w">
+        <DevScope id="pobfja7">
+          <div style={{ height: '100%', padding: '0.75rem', background: '#111827', color: '#9ca3af', boxSizing: 'border-box' }}>
+            Drag the handle, use arrow keys when focused, or double-click to reset. Size persists in localStorage.
+          </div>
+        </DevScope>
+        <SplitPane direction="vertical" defaultSize={140} minSize={60} maxSize={220} devId="yc9gc6q">
+          <DevScope id="9ilks1m">
+            <div style={{ height: '100%', padding: '0.75rem', background: '#1f2937', color: '#e5e7eb', boxSizing: 'border-box' }}>
+              Top pane (fixed height)
+            </div>
+          </DevScope>
+          <DevScope id="psjizj6">
+            <div style={{ height: '100%', padding: '0.75rem', background: '#111827', color: '#e5e7eb', boxSizing: 'border-box' }}>
+              Bottom pane (flexes)
+            </div>
+          </DevScope>
+        </SplitPane>
+      </SplitPane>
+    </div>
+  </DevScope>
+)
+
+const TAB_STRIP_DEMO_TABS = [
+  ...EDITOR_DEMO_IDS.map((id, i) => ({ id, label: EDITOR_DEMO_DOCS[id].label, title: id, dirty: i === 1 })),
+  ...Array.from({ length: 6 }, (_, i) => ({ id: `demo/module-${i + 1}.js`, label: `module-${i + 1}.js`, title: `demo/module-${i + 1}.js`, dirty: false })),
+]
+
+const TabStripDemo = () => {
+  const [tabs, setTabs] = useState(TAB_STRIP_DEMO_TABS)
+  const [activeId, setActiveId] = useState(TAB_STRIP_DEMO_TABS[0].id)
+
+  const close = (id) => {
+    const index = tabs.findIndex((tab) => tab.id === id)
+    const next = tabs.filter((tab) => tab.id !== id)
+    setTabs(next)
+    if (id === activeId) setActiveId(next[Math.min(index, next.length - 1)]?.id ?? null)
+  }
+
+  const toggleDirty = () => setTabs((prev) =>
+    prev.map((tab) => (tab.id === activeId ? { ...tab, dirty: !tab.dirty } : tab))
+  )
+
+  const reset = () => {
+    setTabs(TAB_STRIP_DEMO_TABS)
+    setActiveId(TAB_STRIP_DEMO_TABS[0].id)
+  }
+
+  const items = tabs.map((tab) => ({
+    ...tab,
+    icon: EDITOR_DEMO_DOCS[tab.id] ? <EditorDemoBadge id={tab.id} /> : <span style={{ color: '#facc15', fontSize: 10, fontWeight: 700 }}>JS</span>,
+  }))
+
+  return (
+    <DevScope id="51ai9el" state={{ activeId, count: tabs.length }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', textAlign: 'left', maxWidth: 560 }}>
+        <div style={{ border: '1px solid #374151' }}>
+          <TabStrip items={items} activeId={activeId} select={setActiveId} close={close} devId="j5lkmsh" />
+          <div style={{ padding: '0.75rem', background: '#282c34', color: '#9ca3af', minHeight: 60 }}>
+            {activeId ?? 'No open tabs'}
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <Button devId="lrnxjgl" size="sm" variant="secondary" onClick={toggleDirty} disabled={!activeId}>
+            Toggle dirty
+          </Button>
+          <Button devId="mwvsh49" size="sm" variant="ghost" onClick={reset}>
+            Reset tabs
+          </Button>
+        </div>
+      </div>
+    </DevScope>
+  )
+}
+
+const StatusBarDemo = () => {
+  const [indent, setIndent] = useState(2)
+
+  return (
+    <DevScope id="4tujtwx">
+      <div style={{ maxWidth: 560, border: '1px solid #374151' }}>
+        <StatusBar devId="wr9pxhn">
+          <StatusBarItem devId="x6nh02s">main</StatusBarItem>
+          <StatusBarItem align="right" title="Change indentation" onClick={() => setIndent((prev) => (prev === 2 ? 4 : 2))} devId="ib6rfwv">
+            Spaces: {indent}
+          </StatusBarItem>
+          <StatusBarItem align="right" devId="ac0610q">Ln 3, Col 5</StatusBarItem>
+        </StatusBar>
+      </div>
+    </DevScope>
+  )
+}
+
+const EditorPrimitivesDemo = () => {
+  const [openIds, setOpenIds] = useState(EDITOR_DEMO_IDS.slice(0, 2))
+  const [activeId, setActiveId] = useState(EDITOR_DEMO_IDS[0])
+  const [texts, setTexts] = useState(editorDemoTexts)
+  const [saved, setSaved] = useState(editorDemoTexts)
+  const [cursor, setCursor] = useState({ line: 1, col: 1, selected: 0 })
+
+  const isDirty = (id) => texts[id] !== saved[id]
+  const activeDirty = activeId ? isDirty(activeId) : false
+
+  const open = (id) => {
+    setOpenIds((prev) => (prev.includes(id) ? prev : [...prev, id]))
+    setActiveId(id)
+  }
+
+  const close = (id) => {
+    const index = openIds.indexOf(id)
+    const next = openIds.filter((openId) => openId !== id)
+    setOpenIds(next)
+    setTexts((prev) => ({ ...prev, [id]: saved[id] }))
+    if (id === activeId) setActiveId(next[Math.min(index, next.length - 1)] ?? null)
+  }
+
+  const save = () => {
+    if (!activeId) return
+    setSaved((prev) => ({ ...prev, [activeId]: texts[activeId] }))
+  }
+
+  const items = openIds.map((id) => ({
+    id,
+    label: EDITOR_DEMO_DOCS[id].label,
+    title: id,
+    dirty: isDirty(id),
+    icon: <EditorDemoBadge id={id} />,
+  }))
+
+  return (
+    <DevScope id="lsfs9e1" state={{ activeId: activeId ?? null, open: openIds.length }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', textAlign: 'left' }}>
+        <p style={{ margin: 0, color: '#9ca3af', fontSize: '0.875rem' }}>
+          Open files from the sidebar, edit, and press Mod-S to save. Closing a tab discards unsaved changes.
+        </p>
+        <div style={{ height: 420, border: '1px solid #374151' }}>
+          <SplitPane defaultSize={180} minSize={120} maxSize={360} storageKey="component-library.demo.editor-sidebar" devId="hcz2me4">
+            <DevScope id="e3934vw">
+              <div style={{ height: '100%', overflow: 'auto', padding: '0.5rem 0', background: '#111827', boxSizing: 'border-box' }}>
+                {EDITOR_DEMO_IDS.map((id) => (
+                  <DevScope key={id} id="ldryfuy" state={{ file: id, active: id === activeId }}>
+                    <button
+                      type="button"
+                      onClick={() => open(id)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        width: '100%',
+                        padding: '4px 12px',
+                        border: 'none',
+                        background: id === activeId ? '#1f2937' : 'none',
+                        color: '#e5e7eb',
+                        font: 'inherit',
+                        fontSize: 13,
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <EditorDemoBadge id={id} />
+                      {EDITOR_DEMO_DOCS[id].label}
+                      {isDirty(id) && <span style={{ marginLeft: 'auto', color: '#9ca3af' }}>●</span>}
+                    </button>
+                  </DevScope>
+                ))}
+              </div>
+            </DevScope>
+            <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <TabStrip items={items} activeId={activeId} select={setActiveId} close={close} devId="08xs74i" />
+              <div style={{ position: 'relative', flex: 1, minHeight: 0, background: '#282c34' }}>
+                <CodeEditor
+                  docId={activeId}
+                  value={activeId ? texts[activeId] : ''}
+                  filename={activeId ? EDITOR_DEMO_DOCS[activeId].filename : undefined}
+                  docIds={openIds}
+                  keys={[{ key: 'Mod-s', run: () => { save(); return true } }]}
+                  onChange={(value, id) => setTexts((prev) => ({ ...prev, [id]: value }))}
+                  onCursorChange={setCursor}
+                  devId="mtkh6bh"
+                />
+                {!activeId && (
+                  <DevScope id="xtgf6jt">
+                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280' }}>
+                      Open a file from the sidebar
+                    </div>
+                  </DevScope>
+                )}
+              </div>
+              <StatusBar devId="d33l535">
+                <StatusBarItem devId="f95mauz">{activeId ?? 'No file'}</StatusBarItem>
+                {activeId && (
+                  <StatusBarItem devId="c4nweyf" title={activeDirty ? 'Save (Mod-S)' : undefined} onClick={activeDirty ? save : undefined}>
+                    {activeDirty ? '● Unsaved' : 'Saved'}
+                  </StatusBarItem>
+                )}
+                {activeId && <StatusBarItem align="right" devId="58z9jh2">{formatCursor(cursor)}</StatusBarItem>}
+              </StatusBar>
+            </div>
+          </SplitPane>
+        </div>
+      </div>
     </DevScope>
   )
 }
@@ -1609,6 +2155,61 @@ const App = () => (
       </DevScope>
     </Section>
 
+    <Section title="CodeEditor">
+      <DevScope id="80pzimq">
+        <Fold>
+          <FoldTrigger>Per-document State</FoldTrigger>
+          <FoldContent>
+            <CodeEditorDemo />
+          </FoldContent>
+        </Fold>
+      </DevScope>
+    </Section>
+
+    <Section title="SplitPane">
+      <DevScope id="rv3jss8">
+        <Fold>
+          <FoldTrigger>Nested Horizontal And Vertical</FoldTrigger>
+          <FoldContent>
+            <SplitPaneDemo />
+          </FoldContent>
+        </Fold>
+      </DevScope>
+    </Section>
+
+    <Section title="TabStrip">
+      <DevScope id="krxe62t">
+        <Fold>
+          <FoldTrigger>Editor Tabs With Dirty State</FoldTrigger>
+          <FoldContent>
+            <TabStripDemo />
+          </FoldContent>
+        </Fold>
+      </DevScope>
+    </Section>
+
+    <Section title="StatusBar">
+      <DevScope id="2g3344q">
+        <Fold>
+          <FoldTrigger>Left And Right Items</FoldTrigger>
+          <FoldContent>
+            <StatusBarDemo />
+          </FoldContent>
+        </Fold>
+      </DevScope>
+    </Section>
+
+    <Section title="Editor primitives">
+      <DevScope id="rk1gxxw">
+        <Fold>
+          <FoldTrigger>SplitPane + TabStrip + CodeEditor + StatusBar</FoldTrigger>
+          <FoldContent>
+            <EditorPrimitivesDemo />
+          </FoldContent>
+        </Fold>
+      </DevScope>
+    </Section>
+
     <Section title="Canvas">
       <DevScope id="o9sz6ol">
         <Fold>
@@ -1679,6 +2280,30 @@ const App = () => (
           <FoldContent>
             <DevScope id="az1bwx4">
               <VirtualListDemo />
+            </DevScope>
+          </FoldContent>
+        </Fold>
+      </DevScope>
+    </Section>
+
+    <Section title="TreeView">
+      <DevScope id="wm6cojo">
+        <Fold>
+          <FoldTrigger>Lazy File Tree With Context Menu</FoldTrigger>
+          <FoldContent>
+            <DevScope id="l20jfi8">
+              <TreeViewDemo />
+            </DevScope>
+          </FoldContent>
+        </Fold>
+      </DevScope>
+
+      <DevScope id="v5kpyp3">
+        <Fold>
+          <FoldTrigger>FileIcon Gallery</FoldTrigger>
+          <FoldContent>
+            <DevScope id="ajxijhy">
+              <FileIconGallery />
             </DevScope>
           </FoldContent>
         </Fold>

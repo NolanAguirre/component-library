@@ -1,32 +1,53 @@
-import { useState, useRef, useEffect, Children, cloneElement } from 'react'
+import { useState, useRef, useEffect, useLayoutEffect, Children, cloneElement } from 'react'
+import { createPortal } from 'react-dom'
+import { DevScope } from '../DevInspector/devInspector'
+import { fuzzyScore } from '../../lib/fuzzyScore'
 import './styles.css'
 
-/**
- * fuzzyScore — subsequence match score for a fuzzy filter.
- *
- * Returns null when the query characters are not all present, in order, in the
- * text. Otherwise returns a score where contiguous runs and earlier matches
- * rank higher, so the closest matches sort to the top.
- */
-const fuzzyScore = (text, query) => {
-  const haystack = text.toLowerCase()
-  const needle = query.toLowerCase()
-  let score = 0
-  let searchFrom = 0
-  let previousMatch = -2
+const MENU_GAP = 4
+const VIEWPORT_PAD = 8
+const MENU_MAX = 240
+const MENU_MIN = 72
 
-  for (const char of needle) {
-    const matchIndex = haystack.indexOf(char, searchFrom)
-    if (matchIndex === -1) return null
+// The menu is portalled so an overflow container (a popup panel) cannot scroll
+// it out of view. Height is capped to the larger side of the trigger.
+const placeMenu = (anchor, menu) => {
+  const rect = anchor.getBoundingClientRect()
+  const width = Math.min(rect.width, Math.max(0, window.innerWidth - VIEWPORT_PAD * 2))
+  const maxLeft = Math.max(VIEWPORT_PAD, window.innerWidth - width - VIEWPORT_PAD)
+  const left = Math.min(Math.max(rect.left, VIEWPORT_PAD), maxLeft)
 
-    score += matchIndex === previousMatch + 1 ? 2 : 1
-    score -= matchIndex * 0.01
+  menu.style.left = `${left}px`
+  menu.style.width = `${width}px`
 
-    previousMatch = matchIndex
-    searchFrom = matchIndex + 1
+  const spaceBelow = window.innerHeight - rect.bottom - MENU_GAP - VIEWPORT_PAD
+  const spaceAbove = rect.top - MENU_GAP - VIEWPORT_PAD
+  const openBelow = spaceBelow >= spaceAbove
+  const available = Math.max(openBelow ? spaceBelow : spaceAbove, MENU_MIN)
+  const list = menu.querySelector('.form-dropdown__items')
+  const chrome = Math.max(0, menu.offsetHeight - (list?.offsetHeight ?? 0))
+  const listMax = Math.min(MENU_MAX, Math.max(available - chrome, MENU_MIN))
+
+  if (list) list.style.maxHeight = `${listMax}px`
+
+  if (openBelow) {
+    menu.style.top = `${rect.bottom + MENU_GAP}px`
+    menu.style.bottom = 'auto'
+  } else {
+    menu.style.top = 'auto'
+    menu.style.bottom = `${window.innerHeight - rect.top + MENU_GAP}px`
   }
+}
 
-  return score
+const revealHighlighted = (menu) => {
+  const list = menu.querySelector('.form-dropdown__items')
+  const highlighted = list?.querySelector('.form-dropdown__item--highlighted')
+  if (!list || !highlighted) return
+
+  const listRect = list.getBoundingClientRect()
+  const itemRect = highlighted.getBoundingClientRect()
+  if (itemRect.top < listRect.top) list.scrollTop -= listRect.top - itemRect.top
+  else if (itemRect.bottom > listRect.bottom) list.scrollTop += itemRect.bottom - listRect.bottom
 }
 
 // searchValue lets an option render a node as its displayValue and still be filterable
@@ -99,7 +120,8 @@ export const DropdownTypeaheadTrigger = ({ dropdown: { isOpen, toggle, displayVa
  * DropdownTypeaheadMenu — positioned list container.
  *
  * Receives dropdown:{ isOpen, highlightedIndex, select, selected } via cloneElement.
- * Only renders its children when the menu is open.
+ * Only renders its children when the menu is open. The open menu is portalled to
+ * document.body so a scrolling popup cannot clip it or steal the wheel.
  */
 export const DropdownTypeaheadMenu = ({
   dropdown: {
@@ -115,12 +137,40 @@ export const DropdownTypeaheadMenu = ({
     canCreate = false,
     createValue = '',
     create = () => {},
+    containerRef,
+    menuRef,
   } = {},
   filterPlaceholder = 'Filter options...',
   emptyMessage = 'No options found',
   createLabel = (value) => `Create "${value}"`,
   children,
 }) => {
+  useLayoutEffect(() => {
+    if (!isOpen) return undefined
+
+    const anchor = containerRef?.current
+    const menu = menuRef?.current
+    if (!anchor || !menu) return undefined
+
+    const place = () => {
+      placeMenu(anchor, menu)
+      revealHighlighted(menu)
+    }
+    const onScroll = (event) => {
+      if (menu.contains(event.target)) return
+      place()
+    }
+
+    place()
+    window.addEventListener('resize', place)
+    window.addEventListener('scroll', onScroll, true)
+
+    return () => {
+      window.removeEventListener('resize', place)
+      window.removeEventListener('scroll', onScroll, true)
+    }
+  }, [isOpen, containerRef, menuRef, query, filteredOptions.length, canCreate, highlightedIndex])
+
   if (!isOpen) return null
 
   const items = Children.count(children) > 0
@@ -139,42 +189,45 @@ export const DropdownTypeaheadMenu = ({
     })
   )
 
-  return (
-    <div className="form-dropdown__menu">
-      {filterable && (
-        <div className="form-dropdown__filter">
-          <input
-            className="form-dropdown__filter-input"
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={filterPlaceholder}
-            autoFocus
-          />
-          {query && (
-            <button className="form-dropdown__filter-clear" type="button" onClick={clearQuery} aria-label="Clear filter">
-              ×
-            </button>
-          )}
-        </div>
-      )}
-      {enhanced.length > 0 && (
-        <ul className="form-dropdown__items" role="listbox">
-          {enhanced}
-        </ul>
-      )}
-      {canCreate ? (
-        <button
-          type="button"
-          className={`form-dropdown__create${highlightedIndex === -1 ? ' form-dropdown__create--highlighted' : ''}`}
-          onClick={() => create()}
-        >
-          {createLabel(createValue)}
-        </button>
-      ) : (
-        enhanced.length === 0 && <div className="form-dropdown__empty">{emptyMessage}</div>
-      )}
-    </div>
+  return createPortal(
+    <DevScope id="p4w8n2c">
+      <div className="form-dropdown__menu" ref={menuRef}>
+        {filterable && (
+          <div className="form-dropdown__filter">
+            <input
+              className="form-dropdown__filter-input"
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={filterPlaceholder}
+              autoFocus
+            />
+            {query && (
+              <button className="form-dropdown__filter-clear" type="button" onClick={clearQuery} aria-label="Clear filter">
+                ×
+              </button>
+            )}
+          </div>
+        )}
+        {enhanced.length > 0 && (
+          <ul className="form-dropdown__items" role="listbox">
+            {enhanced}
+          </ul>
+        )}
+        {canCreate ? (
+          <button
+            type="button"
+            className={`form-dropdown__create${highlightedIndex === -1 ? ' form-dropdown__create--highlighted' : ''}`}
+            onClick={() => create()}
+          >
+            {createLabel(createValue)}
+          </button>
+        ) : (
+          enhanced.length === 0 && <div className="form-dropdown__empty">{emptyMessage}</div>
+        )}
+      </div>
+    </DevScope>,
+    document.body,
   )
 }
 
@@ -222,6 +275,7 @@ export const DropdownTypeaheadDisplay = ({
   createValue = '',
   create = () => {},
   containerRef,
+  menuRef,
   handleKeyDown,
   children,
 }) => {
@@ -248,6 +302,8 @@ export const DropdownTypeaheadDisplay = ({
           canCreate,
           createValue,
           create,
+          containerRef,
+          menuRef,
         },
       })
     }
@@ -288,6 +344,7 @@ export const withDropdownTypeahead = (WrappedComponent) => ({
   const [query, setQuery] = useState('')
   const [highlightedIndex, setHighlightedIndex] = useState(-1)
   const containerRef = useRef(null)
+  const menuRef = useRef(null)
   const isFilterable = filter || filterable
   const filteredOptions = isFilterable ? filterOptions(options, query) : options
   const normalizedQuery = query.trim()
@@ -400,7 +457,9 @@ export const withDropdownTypeahead = (WrappedComponent) => ({
     if (!isOpen) return
 
     const handleClickOutside = (e) => {
-      if (containerRef.current && !containerRef.current.contains(e.target)) {
+      const insideField = containerRef.current?.contains(e.target)
+      const insideMenu = menuRef.current?.contains(e.target)
+      if (!insideField && !insideMenu) {
         setIsOpen(false)
         setQuery('')
       }
@@ -427,6 +486,7 @@ export const withDropdownTypeahead = (WrappedComponent) => ({
       createValue={normalizedQuery}
       create={triggerCreate}
       containerRef={containerRef}
+      menuRef={menuRef}
       handleKeyDown={handleKeyDown}
       {...props}
     />

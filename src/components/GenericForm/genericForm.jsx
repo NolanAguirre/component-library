@@ -81,6 +81,7 @@ export const GenericFormDisplay = ({
   cancel,
   children,
   component: Component,
+  componentProps,
   resultComponent: ResultComponent,
 }) => {
   const fields = config.fields ?? {}
@@ -92,7 +93,7 @@ export const GenericFormDisplay = ({
       )}
       <CardSection>
         <FormDisplay form={form}>
-          {Component ? <Component form={form} /> : Object.entries(fields)
+          {Component ? <Component {...componentProps} form={form} /> : Object.entries(fields)
             .filter(([, fieldConfig]) => typeComponentMap[fieldConfig.type ?? 'text'])
             .map(([name, fieldConfig]) => {
               const { component: Component, props: getProps } = typeComponentMap[fieldConfig.type ?? 'text']
@@ -145,4 +146,3 @@ const withGenericForm = (WrappedComponent) => ({ config = {}, submit, onSubmit, 
 
 const GenericForm = withGenericForm(GenericFormDisplay)
 export default GenericForm
-

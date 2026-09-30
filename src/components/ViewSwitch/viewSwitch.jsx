@@ -124,27 +124,44 @@ export const ViewSwitchView = ({
  *
  * Manages the active index and delegates all rendering to the wrapped display component.
  * Accepts an optional `defaultIndex` prop to set the initial view.
+ * Pass `index` to control the active view, and `onSelect` to hear every change.
  *
  * Provides three navigation actions:
  *   select(i) — jump directly to index i
  *   next()    — advance by one (wraps to 0 when loop is true, else clamped)
  *   back()    — retreat by one (wraps to count - 1 when loop is true, else clamped)
  */
-export const withViewSwitch = (WrappedComponent) => ({ defaultIndex = 0, count = 0, loop = false, ...props }) => {
-  const [index, setIndex] = useState(defaultIndex)
+export const withViewSwitch = (WrappedComponent) => ({
+  defaultIndex = 0,
+  index: controlledIndex,
+  onSelect,
+  count = 0,
+  loop = false,
+  ...props
+}) => {
+  const [uncontrolledIndex, setIndex] = useState(defaultIndex)
+  const isControlled = controlledIndex !== undefined
+  const index = isControlled ? controlledIndex : uncontrolledIndex
   const maxIndex = Math.max(count - 1, 0)
   const wrapCount = Math.max(count, 1)
 
   useEffect(() => {
+    if (isControlled) return
     setIndex((prev) => Math.min(Math.max(prev, 0), maxIndex))
-  }, [maxIndex])
+  }, [maxIndex, isControlled])
 
-  const select = (i) => setIndex(Math.min(Math.max(i, 0), maxIndex))
-  const next = () => setIndex((prev) => (loop ? (prev + 1) % wrapCount : Math.min(prev + 1, maxIndex)))
-  const back = () => setIndex((prev) => (loop ? (prev - 1 + wrapCount) % wrapCount : Math.max(prev - 1, 0)))
+  const commit = (nextIndex) => {
+    const clamped = Math.min(Math.max(nextIndex, 0), maxIndex)
+    if (!isControlled) setIndex(clamped)
+    if (onSelect) onSelect(clamped)
+  }
+
+  const select = (i) => commit(i)
+  const next = () => commit(loop ? (index + 1) % wrapCount : Math.min(index + 1, maxIndex))
+  const back = () => commit(loop ? (index - 1 + wrapCount) % wrapCount : Math.max(index - 1, 0))
 
   return (
-    <WrappedComponent index={index} count={count} loop={loop} select={select} next={next} back={back} {...props} />
+    <WrappedComponent {...props} index={index} count={count} loop={loop} select={select} next={next} back={back} />
   )
 }
 
