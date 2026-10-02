@@ -22,17 +22,25 @@ const CloseIcon = () => (
  * the popup panel.
  *
  * Props:
- *   isOpen   {boolean}   — whether the popup is visible
- *   open     {function}  — triggers the popup to open
- *   close    {function}  — triggers the popup to close
- *   devId    {string}    — DevScope id for the portalled popup (default: `n4p8w2k`)
- *   children             — [popupContent, trigger] or content only
+ *   isOpen         {boolean}   — whether the popup is visible
+ *   open           {function}  — triggers the popup to open
+ *   close          {function}  — triggers the popup to close
+ *   devId          {string}    — DevScope id for the portalled panel (default: `n4p8w2k`)
+ *   backdropDevId  {string}    — DevScope id for the dimmed overlay (default: `yfmw976`)
+ *   closeDevId     {string}    — DevScope id for the close button (default: `i1phlai`)
+ *   contentDevId   {string}    — DevScope id for the popup content (default: `8cp376n`)
+ *   triggerDevId   {string}    — DevScope id for the trigger (default: `553jdpc`)
+ *   children                   — [popupContent, trigger] or content only
  */
 export const PopupDisplay = ({
   isOpen = false,
   open = () => {},
   close = () => {},
   devId = 'n4p8w2k',
+  backdropDevId = 'yfmw976',
+  closeDevId = 'i1phlai',
+  contentDevId = '8cp376n',
+  triggerDevId = '553jdpc',
   children,
   backdropClassName = '',
   panelClassName = '',
@@ -89,34 +97,45 @@ export const PopupDisplay = ({
   const backdropClass = `popup__backdrop${backdropClassName ? ` ${backdropClassName}` : ''}`
   const panelClass = `popup__panel${panelClassName ? ` ${panelClassName}` : ''}`
 
-  // Scope the panel (not the full-viewport backdrop) so the inspector outline
-  // matches the popup, not the whole screen. The DevScope sits inside the
-  // portal so it tags the popup DOM and links back to the caller's chain.
+  // Each region has its own scope. The panel scope is the popup box; the
+  // backdrop scope is the leaf only while the pointer is on the dimmed overlay,
+  // so that outline stays full-viewport. Scopes sit inside the portal so they
+  // tag the popup DOM and link back to the caller's chain.
+  const scopedContent = <DevScope id={contentDevId}>{enhancedContent}</DevScope>
+  const panelState = { contentOnly: contentOnly || undefined }
   const backdrop = isOpen
     ? createPortal(
-        <div className={backdropClass} onClick={close}>
-          {contentOnly ? (
-            <DevScope id={devId}>{enhancedContent}</DevScope>
-          ) : (
-            <DevScope id={devId}>
-              <div className={panelClass} onClick={(e) => e.stopPropagation()}>
-                {showClose && (
-                  <button type="button" className="popup__close" onClick={close} aria-label="Close popup">
-                    <CloseIcon />
-                  </button>
-                )}
-                {enhancedContent}
-              </div>
-            </DevScope>
-          )}
-        </div>,
+        <DevScope id={backdropDevId}>
+          <div className={backdropClass} onClick={close}>
+            {contentOnly ? (
+              <DevScope id={devId} state={panelState}>{scopedContent}</DevScope>
+            ) : (
+              <DevScope id={devId} state={panelState}>
+                <div className={panelClass} onClick={(e) => e.stopPropagation()}>
+                  {showClose && (
+                    <DevScope id={closeDevId}>
+                      <button type="button" className="popup__close" onClick={close} aria-label="Close popup">
+                        <CloseIcon />
+                      </button>
+                    </DevScope>
+                  )}
+                  {scopedContent}
+                </div>
+              </DevScope>
+            )}
+          </div>
+        </DevScope>,
         document.body,
       )
     : null
 
+  const scopedTrigger = enhancedTrigger != null
+    ? <DevScope id={triggerDevId} state={{ open: isOpen || undefined }}>{enhancedTrigger}</DevScope>
+    : enhancedTrigger
+
   return (
     <>
-      {enhancedTrigger}
+      {scopedTrigger}
       {backdrop}
     </>
   )

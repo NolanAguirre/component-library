@@ -6,6 +6,7 @@ import MediaCompare from './components/MediaCompare/mediaCompare'
 import MediaLightbox from './components/MediaLightbox/mediaLightbox'
 import MediaMagnifier from './components/MediaMagnifier/mediaMagnifier'
 import MediaPicker from './components/MediaPicker/mediaPicker'
+import MediaPlaylist from './components/MediaPlaylist/mediaPlaylist'
 import OrderingContainer from './components/OrderingContainer/orderingContainer'
 import { OrderDisplay } from './components/Order/order'
 import Fold, { FoldTrigger, FoldContent } from './components/Fold/fold'
@@ -222,6 +223,13 @@ const LIGHTBOX_ITEMS = [
     type: 'video',
     extension: 'mp4',
   },
+]
+
+const PLAYLIST_ITEMS = [
+  { id: 'wave-1', title: 'George Wave', src: new URL('./assets/george-wave.mp4', import.meta.url).href, poster: new URL('./assets/george.webp', import.meta.url).href },
+  { id: 'wave-2', title: 'George Wave (Again)', src: new URL('./assets/george-wave.mp4', import.meta.url).href },
+  { id: 'wave-3', title: 'George Wave: The Return', src: new URL('./assets/george-wave.mp4', import.meta.url).href, poster: new URL('./assets/george.webp', import.meta.url).href },
+  { id: 'wave-4', title: 'George Wave Forever', src: new URL('./assets/george-wave.mp4', import.meta.url).href },
 ]
 
 const LOCATION_OPTIONS = [
@@ -2976,6 +2984,48 @@ const App = () => (
           <FoldContent>
             <DevScope id="qeiotz4">
               <MediaPickerDemo multiple={false} title="Pick one" />
+            </DevScope>
+          </FoldContent>
+        </Fold>
+      </DevScope>
+
+      <DevScope id="q7v2k9d">
+        <Fold>
+          <FoldTrigger>Video Player (10s Skip)</FoldTrigger>
+          <FoldContent>
+            <div style={{ width: 640, height: 360 }}>
+              <DevScope id="b4m8x1z">
+                <Media
+                  src={new URL('./assets/george-wave.mp4', import.meta.url).href}
+                  poster={new URL('./assets/george.webp', import.meta.url).href}
+                  type="video"
+                  variant="full"
+                />
+              </DevScope>
+            </div>
+          </FoldContent>
+        </Fold>
+      </DevScope>
+    </Section>
+
+    <Section title="MediaPlaylist">
+      <DevScope id="t6r3p0w">
+        <Fold>
+          <FoldTrigger>Playlist</FoldTrigger>
+          <FoldContent>
+            <DevScope id="h2n9c5j">
+              <MediaPlaylist items={PLAYLIST_ITEMS} />
+            </DevScope>
+          </FoldContent>
+        </Fold>
+      </DevScope>
+
+      <DevScope id="e8s1f4y">
+        <Fold>
+          <FoldTrigger>Looping, Playlist Hidden</FoldTrigger>
+          <FoldContent>
+            <DevScope id="w3k7d2m">
+              <MediaPlaylist items={PLAYLIST_ITEMS} loop defaultQueueOpen={false} />
             </DevScope>
           </FoldContent>
         </Fold>

@@ -28,6 +28,23 @@ const DocumentIcon = () => (
   </svg>
 )
 
+const SkipIcon = ({ direction }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    {direction === 'back' ? (
+      <>
+        <path d="M3 12a9 9 0 1 0 3-6.7" />
+        <polyline points="3 3 3 9 9 9" />
+      </>
+    ) : (
+      <>
+        <path d="M21 12a9 9 0 1 1-3-6.7" />
+        <polyline points="21 3 21 9 15 9" />
+      </>
+    )}
+    <text x="12" y="15.5" textAnchor="middle" fontSize="8" fontWeight="700" fill="currentColor" stroke="none">10</text>
+  </svg>
+)
+
 const PlaceholderIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <rect x="3" y="3" width="18" height="18" rx="2" />
@@ -74,8 +91,11 @@ const MediaImage = ({ src, extension, variant, magnify = true }) => {
   )
 }
 
-const MediaVideo = ({ src, poster, variant }) => {
+const SKIP_SECONDS = 10
+
+const MediaVideo = ({ src, poster, variant, autoPlay = true, loop = true, onEnded }) => {
   const playPromiseRef = useRef(null)
+  const videoRef = useRef(null)
 
   if (!src) {
     return (
@@ -86,7 +106,44 @@ const MediaVideo = ({ src, poster, variant }) => {
   }
 
   if (variant === 'full') {
-    return <video src={src} poster={poster} className="media__video" controls autoPlay loop playsInline />
+    const skip = (seconds) => {
+      const video = videoRef.current
+      if (!video) return
+      const end = Number.isFinite(video.duration) ? video.duration : Infinity
+      video.currentTime = Math.min(Math.max(video.currentTime + seconds, 0), end)
+    }
+
+    return (
+      <>
+        <video
+          ref={videoRef}
+          src={src}
+          poster={poster}
+          className="media__video"
+          controls
+          autoPlay={autoPlay}
+          loop={loop}
+          playsInline
+          onEnded={onEnded}
+        />
+        <button
+          type="button"
+          className="media__skip media__skip--back"
+          onClick={() => skip(-SKIP_SECONDS)}
+          aria-label={`Back ${SKIP_SECONDS} seconds`}
+        >
+          <SkipIcon direction="back" />
+        </button>
+        <button
+          type="button"
+          className="media__skip media__skip--forward"
+          onClick={() => skip(SKIP_SECONDS)}
+          aria-label={`Forward ${SKIP_SECONDS} seconds`}
+        >
+          <SkipIcon direction="forward" />
+        </button>
+      </>
+    )
   }
 
   const handleEnter = (e) => {
@@ -201,6 +258,9 @@ const Media = ({
   className,
   children,
   magnify = true,
+  autoPlay,
+  loop,
+  onEnded,
 }) => {
   const Renderer = RENDERERS[type] || RENDERERS.image
 
@@ -212,7 +272,7 @@ const Media = ({
 
   return (
     <div className={`media media--${type} media--${variant}${!src ? ' media--empty' : ''}${className ? ` ${className}` : ''}`}>
-      <Renderer src={src} alt={alt} variant={variant} extension={extension} poster={poster} magnify={magnify} />
+      <Renderer src={src} alt={alt} variant={variant} extension={extension} poster={poster} magnify={magnify} autoPlay={autoPlay} loop={loop} onEnded={onEnded} />
       {enhanced}
     </div>
   )

@@ -39,6 +39,7 @@ export { default as MediaCompare, MediaCompareDisplay, withMediaCompareAlign } f
 export { default as MediaLightbox, MediaLightboxDisplay } from './components/MediaLightbox/mediaLightbox'
 export { default as MediaMagnifier, MediaMagnifierDisplay, withMediaMagnifier } from './components/MediaMagnifier/mediaMagnifier'
 export { default as MediaPicker, MediaPickerDisplay } from './components/MediaPicker/mediaPicker'
+export { default as MediaPlaylist, MediaPlaylistDisplay, MediaPlaylistPlayer, MediaPlaylistControls, MediaPlaylistQueue, withMediaPlaylist } from './components/MediaPlaylist/mediaPlaylist'
 export { default as MultiFileUpload } from './components/MultiFileUpload/multiFileUpload'
 export { default as MultiSelect, MultiSelectDisplay, withMultiSelect } from './components/MultiSelect/multiSelect'
 export { default as OrderDisplay } from './components/Order/order'
@@ -71,6 +72,7 @@ export { default as CodeEditor } from './components/CodeEditor/codeEditor'
 export { default as StatusBar, StatusBarItem } from './components/StatusBar/statusBar'
 
 export { fuzzyScore } from './lib/fuzzyScore'
+export { randomUUID } from './lib/randomUUID'
 export { imageGridCells, splitCanvasGrid } from './lib/imageGrid'
 export { analyzeBackgroundSplit, splitCanvasBackground } from './lib/imageBackgroundSplit'
 export { default as BackgroundSplit, BackgroundSplitDisplay, BackgroundSplitPreview, withBackgroundSplit } from './components/BackgroundSplit/backgroundSplit'
@@ -78,3 +80,4 @@ export { default as EdgeOffsetHandles } from './components/EdgeOffsetHandles/edg
 export { default as useSnapshotHistory, packSnapshotHistory, unpackSnapshotHistory } from './lib/useSnapshotHistory'
 
 export { default as useFormController, useFormReady } from './components/GenericForm/useFormController'
+export { default as LineAreaChart, LineAreaChartDisplay, withLineAreaChart } from './components/LineAreaChart/lineAreaChart'
