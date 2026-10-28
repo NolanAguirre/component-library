@@ -187,7 +187,7 @@ const MediaVideo = ({ src, poster, variant, autoPlay = true, loop = true, onEnde
   )
 }
 
-const MediaAudio = ({ src, extension, variant }) => {
+const MediaAudio = ({ src, extension, variant, autoPlay = true }) => {
   if (!src) {
     return (
       <div className="media__placeholder">
@@ -205,7 +205,7 @@ const MediaAudio = ({ src, extension, variant }) => {
         )}
       </div>
       {variant === 'full' && (
-        <audio src={src} className="media__audio" controls autoPlay />
+        <audio src={src} className="media__audio" controls autoPlay={autoPlay} />
       )}
     </>
   )

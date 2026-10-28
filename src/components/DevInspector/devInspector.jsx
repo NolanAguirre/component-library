@@ -140,7 +140,7 @@ export const DevScope = ({ id, state, children }) => {
           ...scopeProps,
           ref: (node) => {
             setNode(node)
-            assignRef(hostChild.ref ?? hostChild.props.ref, node)
+            assignRef(hostChild.props.ref, node)
           }
         })
       ) : (

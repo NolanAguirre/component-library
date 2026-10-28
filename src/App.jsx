@@ -34,7 +34,6 @@ import Button from './components/Button/button'
 import Tabs, { TabList, Tab, TabPanel } from './components/Tabs/tabs'
 import CodeEditor from './components/CodeEditor/codeEditor'
 import SplitPane from './components/SplitPane/splitPane'
-import TabStrip from './components/TabStrip/tabStrip'
 import StatusBar, { StatusBarItem } from './components/StatusBar/statusBar'
 import Canvas, { CanvasSurface, CanvasMinimap, CanvasControls } from './components/Canvas/canvas'
 import Timeline from './components/Timeline/timeline'
@@ -1764,58 +1763,6 @@ const SplitPaneDemo = () => (
   </DevScope>
 )
 
-const TAB_STRIP_DEMO_TABS = [
-  ...EDITOR_DEMO_IDS.map((id, i) => ({ id, label: EDITOR_DEMO_DOCS[id].label, title: id, dirty: i === 1 })),
-  ...Array.from({ length: 6 }, (_, i) => ({ id: `demo/module-${i + 1}.js`, label: `module-${i + 1}.js`, title: `demo/module-${i + 1}.js`, dirty: false })),
-]
-
-const TabStripDemo = () => {
-  const [tabs, setTabs] = useState(TAB_STRIP_DEMO_TABS)
-  const [activeId, setActiveId] = useState(TAB_STRIP_DEMO_TABS[0].id)
-
-  const close = (id) => {
-    const index = tabs.findIndex((tab) => tab.id === id)
-    const next = tabs.filter((tab) => tab.id !== id)
-    setTabs(next)
-    if (id === activeId) setActiveId(next[Math.min(index, next.length - 1)]?.id ?? null)
-  }
-
-  const toggleDirty = () => setTabs((prev) =>
-    prev.map((tab) => (tab.id === activeId ? { ...tab, dirty: !tab.dirty } : tab))
-  )
-
-  const reset = () => {
-    setTabs(TAB_STRIP_DEMO_TABS)
-    setActiveId(TAB_STRIP_DEMO_TABS[0].id)
-  }
-
-  const items = tabs.map((tab) => ({
-    ...tab,
-    icon: EDITOR_DEMO_DOCS[tab.id] ? <EditorDemoBadge id={tab.id} /> : <span style={{ color: '#facc15', fontSize: 10, fontWeight: 700 }}>JS</span>,
-  }))
-
-  return (
-    <DevScope id="51ai9el" state={{ activeId, count: tabs.length }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', textAlign: 'left', maxWidth: 560 }}>
-        <div style={{ border: '1px solid #374151' }}>
-          <TabStrip items={items} activeId={activeId} select={setActiveId} close={close} devId="j5lkmsh" />
-          <div style={{ padding: '0.75rem', background: '#282c34', color: '#9ca3af', minHeight: 60 }}>
-            {activeId ?? 'No open tabs'}
-          </div>
-        </div>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <Button devId="lrnxjgl" size="sm" variant="secondary" onClick={toggleDirty} disabled={!activeId}>
-            Toggle dirty
-          </Button>
-          <Button devId="mwvsh49" size="sm" variant="ghost" onClick={reset}>
-            Reset tabs
-          </Button>
-        </div>
-      </div>
-    </DevScope>
-  )
-}
-
 const StatusBarDemo = () => {
   const [indent, setIndent] = useState(2)
 
@@ -1849,32 +1796,16 @@ const EditorPrimitivesDemo = () => {
     setActiveId(id)
   }
 
-  const close = (id) => {
-    const index = openIds.indexOf(id)
-    const next = openIds.filter((openId) => openId !== id)
-    setOpenIds(next)
-    setTexts((prev) => ({ ...prev, [id]: saved[id] }))
-    if (id === activeId) setActiveId(next[Math.min(index, next.length - 1)] ?? null)
-  }
-
   const save = () => {
     if (!activeId) return
     setSaved((prev) => ({ ...prev, [activeId]: texts[activeId] }))
   }
 
-  const items = openIds.map((id) => ({
-    id,
-    label: EDITOR_DEMO_DOCS[id].label,
-    title: id,
-    dirty: isDirty(id),
-    icon: <EditorDemoBadge id={id} />,
-  }))
-
   return (
     <DevScope id="lsfs9e1" state={{ activeId: activeId ?? null, open: openIds.length }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', textAlign: 'left' }}>
         <p style={{ margin: 0, color: '#9ca3af', fontSize: '0.875rem' }}>
-          Open files from the sidebar, edit, and press Mod-S to save. Closing a tab discards unsaved changes.
+          Open files from the sidebar, edit, and press Mod-S to save.
         </p>
         <div style={{ height: 420, border: '1px solid #374151' }}>
           <SplitPane defaultSize={180} minSize={120} maxSize={360} storageKey="component-library.demo.editor-sidebar" devId="hcz2me4">
@@ -1909,7 +1840,6 @@ const EditorPrimitivesDemo = () => {
               </div>
             </DevScope>
             <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-              <TabStrip items={items} activeId={activeId} select={setActiveId} close={close} devId="08xs74i" />
               <div style={{ position: 'relative', flex: 1, minHeight: 0, background: '#282c34' }}>
                 <CodeEditor
                   docId={activeId}
@@ -2185,17 +2115,6 @@ const App = () => (
       </DevScope>
     </Section>
 
-    <Section title="TabStrip">
-      <DevScope id="krxe62t">
-        <Fold>
-          <FoldTrigger>Editor Tabs With Dirty State</FoldTrigger>
-          <FoldContent>
-            <TabStripDemo />
-          </FoldContent>
-        </Fold>
-      </DevScope>
-    </Section>
-
     <Section title="StatusBar">
       <DevScope id="2g3344q">
         <Fold>
@@ -2210,7 +2129,7 @@ const App = () => (
     <Section title="Editor primitives">
       <DevScope id="rk1gxxw">
         <Fold>
-          <FoldTrigger>SplitPane + TabStrip + CodeEditor + StatusBar</FoldTrigger>
+          <FoldTrigger>SplitPane + CodeEditor + StatusBar</FoldTrigger>
           <FoldContent>
             <EditorPrimitivesDemo />
           </FoldContent>

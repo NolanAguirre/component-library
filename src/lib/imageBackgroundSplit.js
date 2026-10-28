@@ -116,7 +116,7 @@ const seamPosition = (path, position) => {
 
 // Copy each scanline between its two seams. Shared integer boundaries assign every
 // source pixel once, while transparent corners allow curved cuts in rectangular PNGs.
-const splitCanvasBackground = (canvas, analysis) => {
+const splitCanvases = (canvas, analysis) => {
   if (canvas.width !== analysis.width || canvas.height !== analysis.height) throw new Error('The image changed. Preview the split again.')
   const vertical = analysis.direction === 'columns'
   const breadth = vertical ? canvas.width : canvas.height
@@ -141,8 +141,46 @@ const splitCanvasBackground = (canvas, analysis) => {
       if (vertical) context.drawImage(canvas, starts[line], line, size, 1, starts[line] - low, line, size, 1)
       else context.drawImage(canvas, line, starts[line], 1, size, line, starts[line] - low, 1, size)
     }
-    return { image: output.toDataURL('image/png'), width: output.width, height: output.height }
+    return { canvas: output, x: vertical ? low : 0, y: vertical ? 0 : low }
   })
 }
 
-export { analyzeBackgroundSplit, splitCanvasBackground }
+const toPart = ({ canvas, ...part }) => ({ ...part, image: canvas.toDataURL('image/png'), width: canvas.width, height: canvas.height })
+
+const splitCanvasBackground = (canvas, analysis) => splitCanvases(canvas, analysis).map(toPart)
+
+// Cut curved rows across the whole image, then curved columns inside each row strip.
+// Strips keep transparent corners, which score as background for the column seams.
+const analyzeBackgroundGridSplit = (canvas, { rowPositions = [], columnPositions = [], color, tolerance = 18 } = {}) => {
+  if (!canvas?.width || !canvas?.height) throw new Error('Wait for the image to load.')
+  if (!rowPositions.length && !columnPositions.length) throw new Error('Choose at least two grid cells.')
+  const rows = rowPositions.length ? analyzeBackgroundSplit(canvas, { positions: rowPositions, direction: 'rows', color, tolerance }) : null
+  const strips = rows ? splitCanvases(canvas, rows) : [{ canvas, x: 0, y: 0 }]
+  let background = rows?.color || color
+  const cells = strips.map(strip => {
+    const analysis = columnPositions.length
+      ? analyzeBackgroundSplit(strip.canvas, { positions: columnPositions, direction: 'columns', color: background, tolerance })
+      : null
+    background = background || analysis.color
+    return { x: strip.x, y: strip.y, width: strip.canvas.width, height: strip.canvas.height, analysis }
+  })
+  return {
+    direction: 'grid', rows, cells, color: background,
+    seams: [...(rows?.seams || []), ...cells.flatMap(cell => cell.analysis?.seams || [])],
+    parts: (rowPositions.length + 1) * (columnPositions.length + 1),
+    preview: rows?.preview || cells[0].analysis.preview,
+    width: canvas.width, height: canvas.height,
+  }
+}
+
+const splitCanvasBackgroundGrid = (canvas, analysis) => {
+  if (canvas.width !== analysis.width || canvas.height !== analysis.height) throw new Error('The image changed. Preview the split again.')
+  const strips = analysis.rows ? splitCanvases(canvas, analysis.rows) : [{ canvas, x: 0, y: 0 }]
+  return strips.flatMap((strip, row) => {
+    const cell = analysis.cells[row]
+    const parts = cell.analysis ? splitCanvases(strip.canvas, cell.analysis) : [{ canvas: strip.canvas, x: 0, y: 0 }]
+    return parts.map((part, column) => toPart({ ...part, x: strip.x + part.x, y: strip.y + part.y, row, column }))
+  })
+}
+
+export { analyzeBackgroundSplit, analyzeBackgroundGridSplit, splitCanvasBackground, splitCanvasBackgroundGrid }

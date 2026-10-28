@@ -362,6 +362,36 @@ const BrowseLightboxInfo = ({ mediaLightbox: { item: file } = {} }) => {
   )
 }
 
+// Transport/controller slot: applications can use their shared server-state store.
+const useHttpBrowser = ({ path, apiBase }) => {
+  const [state, setState] = useState({ listing: null, loading: true, error: null })
+  const generation = useRef(0)
+  const refetch = useCallback(async () => {
+    const request = ++generation.current
+    setState(previous => ({ ...previous, loading: true, error: null }))
+    try {
+      const response = await fetch(browseUrl(apiBase, '', path), { cache: 'no-store' })
+      const listing = await response.json()
+      if (!response.ok) throw new Error(listing.error || 'Failed to browse')
+      if (request === generation.current) setState({ listing, loading: false, error: null })
+    } catch (error) {
+      if (request === generation.current) setState({ listing: null, loading: false, error })
+    }
+  }, [path, apiBase])
+  useEffect(() => { refetch(); return () => { generation.current += 1 } }, [refetch])
+  const request = async (url, options) => {
+    const response = await fetch(url, options)
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({}))
+      throw new Error(body.error || 'Filesystem operation failed')
+    }
+    await refetch()
+  }
+  return { ...state, refetch,
+    createDirectory: name => request(browseUrl(apiBase, '/directory'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path, name }) }),
+    deleteEntry: entryPath => request(browseUrl(apiBase, '', entryPath), { method: 'DELETE' }) }
+}
+
 /**
  * LocalBrowser — filesystem media browser against `/api/browse`.
  *
@@ -376,6 +406,7 @@ const BrowseLightboxInfo = ({ mediaLightbox: { item: file } = {} }) => {
 export const LocalBrowser = ({
   devId,
   apiBase = '',
+  useController = useHttpBrowser,
   compact = false,
   path: pathProp,
   onPathChange,
@@ -387,16 +418,15 @@ export const LocalBrowser = ({
     return ''
   })
   const browsePath = toRelativePath(pathProp !== undefined ? pathProp : internalPath)
-  const [listing, setListing] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const controller = useController({ path: browsePath, apiBase })
+  const { listing, loading } = controller
+  const error = controller.error?.message || controller.error
   const [selectedPath, setSelectedPath] = useState(null)
   const [folderFilter, setFolderFilter] = useState('')
   const [creatingFolder, setCreatingFolder] = useState(false)
   const [newFolderName, setNewFolderName] = useState('untitled folder')
   const [pendingDelete, setPendingDelete] = useState(null)
   const [actionError, setActionError] = useState(null)
-  const [reloadToken, setReloadToken] = useState(0)
   const [view, setView] = useState(() => (localStorage.getItem(VIEW_KEY) === 'list' ? 'list' : 'cards'))
   const [zoom, setZoom] = useState(() => {
     const stored = Number(localStorage.getItem(ZOOM_KEY))
@@ -446,35 +476,8 @@ export const LocalBrowser = ({
   }, [])
 
   useEffect(() => {
-    let cancelled = false
-    const load = async () => {
-      setLoading(true)
-      setError(null)
-      try {
-        const res = await fetch(browseUrl(apiBase, '', browsePath), { cache: 'no-store' })
-        if (!res.ok) {
-          const data = await res.json().catch(() => ({}))
-          throw new Error(data.error || 'Failed to browse')
-        }
-        const data = await res.json()
-        if (!cancelled) {
-          setListing(data)
-          const relative = data.path || ''
-          if (relative !== browsePath) setBrowsePath(relative)
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setListing(null)
-          setError(err.message)
-          if (browsePath) setBrowsePath('')
-        }
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    }
-    load()
-    return () => { cancelled = true }
-  }, [apiBase, browsePath, reloadToken])
+    if (listing && listing.path !== browsePath) setBrowsePath(listing.path || '')
+  }, [listing, browsePath, setBrowsePath])
 
   const files = listing?.files || []
   const directories = listing?.directories || []
@@ -491,12 +494,7 @@ export const LocalBrowser = ({
     }
   }
 
-  const reloadListing = () => setReloadToken((current) => current + 1)
-
-  const readError = async (res, fallback) => {
-    const data = await res.json().catch(() => ({}))
-    return data.error || fallback
-  }
+  const reloadListing = controller.refetch
 
   const handleCreateFolder = async (event) => {
     if (event) event.preventDefault()
@@ -504,15 +502,9 @@ export const LocalBrowser = ({
     if (!name) return
     setActionError(null)
     try {
-      const res = await fetch(browseUrl(apiBase, '/directory'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ path: browsePath, name }),
-      })
-      if (!res.ok) throw new Error(await readError(res, 'Failed to create folder'))
+      await controller.createDirectory(name)
       setCreatingFolder(false)
       setNewFolderName('untitled folder')
-      reloadListing()
     } catch (err) {
       setActionError(err.message)
     }
@@ -527,11 +519,9 @@ export const LocalBrowser = ({
     if (!pendingDelete) return
     setActionError(null)
     try {
-      const res = await fetch(browseUrl(apiBase, '', pendingDelete.path), { method: 'DELETE' })
-      if (!res.ok) throw new Error(await readError(res, 'Failed to delete'))
+      await controller.deleteEntry(pendingDelete.path)
       if (selectedPath === pendingDelete.path) setSelectedPath(null)
       setPendingDelete(null)
-      reloadListing()
     } catch (err) {
       setActionError(err.message)
     }
@@ -809,7 +799,7 @@ export const LocalBrowser = ({
  * Props:
  *   apiBase {string} — origin/prefix for the browse API (e.g. `/lft`)
  */
-export const LocalBrowserOverlay = ({ apiBase = '' }) => {
+export const LocalBrowserOverlay = ({ apiBase = '', useController }) => {
   const [collapsed, setCollapsed] = useState(() => localStorage.getItem(COLLAPSED_KEY) === 'true')
   const [frame, setFrame] = useState(loadOverlayFrame)
   const [dragging, setDragging] = useState(false)
@@ -956,6 +946,7 @@ export const LocalBrowserOverlay = ({ apiBase = '' }) => {
           <LocalBrowser
             devId="j7d2b0n"
             apiBase={apiBase}
+            useController={useController}
             compact
             storageKey={PATH_KEY}
           />

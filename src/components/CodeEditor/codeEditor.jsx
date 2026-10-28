@@ -14,7 +14,6 @@ import {
 } from '@codemirror/view'
 import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands'
 import {
-  LanguageDescription,
   bracketMatching,
   defaultHighlightStyle,
   foldGutter,
@@ -22,22 +21,14 @@ import {
   indentOnInput,
   syntaxHighlighting,
 } from '@codemirror/language'
-import { languages } from '@codemirror/language-data'
 import { autocompletion, closeBrackets, closeBracketsKeymap, completionKeymap } from '@codemirror/autocomplete'
 import { highlightSelectionMatches, searchKeymap } from '@codemirror/search'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { DevScope } from '../DevInspector/devInspector.jsx'
+import { fillTheme, matchLanguage } from './shared'
 import './styles.css'
 
 const external = Annotation.define()
-
-const fillTheme = EditorView.theme({
-  '&': { height: '100%' },
-  '.cm-scroller': {
-    overflow: 'auto',
-    fontFamily: 'var(--code-font, ui-monospace, SFMono-Regular, Menlo, monospace)',
-  },
-})
 
 const baseExtensions = [
   lineNumbers(),
@@ -76,12 +67,6 @@ const readOnlyExtension = (readOnly) => [
 ]
 
 const emptyState = () => EditorState.create({ extensions: [fillTheme, ...readOnlyExtension(true)] })
-
-const matchLanguage = (filename) => {
-  if (!filename) return null
-  const base = String(filename).split(/[\\/]/).pop()
-  return LanguageDescription.matchFilename(languages, base)
-}
 
 const keysSignature = (keys = []) =>
   keys

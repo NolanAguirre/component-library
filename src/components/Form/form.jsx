@@ -221,12 +221,14 @@ const withForm = (WrappedComponent) => ({ config, submit, ...props }) => {
     ...formState,
     fields:        config.fields ?? {},
     setValue:      (name, value) => manager.setValue(name, value),
+    setDefault:    (name, value) => manager.setDefault(name, value),
     setTouched:    (name)        => manager.setTouched(name),
     onChange:      (name, e)     => manager.onChange(name, e),
     onBlur:        (name, e)     => manager.onBlur(name, e),
     validate:      ()            => manager.validate(),
     format:        ()            => manager.format(),
     reset:         ()            => manager.reset(),
+    resetField:    (name)        => manager.resetField(name),
     submit: async () => {
       const result = manager.submit()
       if (result.success && submit) {

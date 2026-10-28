@@ -56,6 +56,7 @@
 
 .media-lightbox__side--left {
   margin-top: 3.75rem;
+  padding-top: 0;
   border-right: 1px solid #262626;
 }
 

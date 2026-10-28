@@ -415,7 +415,7 @@ const withMediaLightboxWheelNavigation = (WrappedComponent) => ({
 
   const handleWheelNavigation = useCallback((event) => {
     if (event.ctrlKey || event.metaKey) return
-    if (event.target?.closest?.('.media-lightbox__details')) return
+    if (event.target?.closest?.('.media-lightbox__details, [data-gesture-ignore]')) return
 
     const horizontalDelta = Math.abs(event.deltaX)
     const verticalDelta = Math.abs(event.deltaY)
@@ -499,7 +499,7 @@ const withMediaLightboxSwipeNavigation = (WrappedComponent) => ({
       clearTouchStart()
       return
     }
-    if (event.target?.closest?.('.media-lightbox__details')) {
+    if (event.target?.closest?.('.media-lightbox__details, [data-gesture-ignore]')) {
       clearTouchStart()
       return
     }

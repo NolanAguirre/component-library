@@ -26,15 +26,35 @@ export const TabsDisplay = ({ index = 0, select = () => {}, children }) => {
  *
  * Receives tabs:{ index, select } from TabsDisplay via cloneElement.
  * Clones its Tab children to pass the tabs namespace down.
+ * Any other children render at the end of the same row, outside the tablist.
  */
 export const TabList = ({ tabs = {}, children }) => {
-  const enhanced = Children.map(children, (child, i) =>
-    cloneElement(child, { tabs, tabIndex: child.props.tabIndex ?? i })
-  )
+  let nextTabIndex = 0
+  const tabNodes = []
+  const extraNodes = []
+
+  Children.forEach(children, (child) => {
+    if (isValidElement(child) && child.type === Tab) {
+      tabNodes.push(cloneElement(child, {
+        tabs,
+        tabIndex: child.props.tabIndex ?? nextTabIndex,
+      }))
+      nextTabIndex += 1
+      return
+    }
+    extraNodes.push(child)
+  })
 
   return (
-    <div className="tabs__list" role="tablist">
-      {enhanced}
+    <div className="tabs__bar">
+      <div className="tabs__list" role="tablist">
+        {tabNodes}
+      </div>
+      {extraNodes.length > 0 && (
+        <div className="tabs__bar-end">
+          {extraNodes}
+        </div>
+      )}
     </div>
   )
 }

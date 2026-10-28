@@ -31,12 +31,16 @@ export default function useFormController(config = {}, onSubmit, custom = false)
   return {
     ...state, fields: config.fields ?? {}, response, error, hasResponse,
     isReady: ready, setReady: setReadyFor,
-    setValue: manager.setValue, setTouched: manager.setTouched,
+    setValue: manager.setValue, setDefault: manager.setDefault, setTouched: manager.setTouched,
     onChange: manager.onChange, onBlur: manager.onBlur,
     validate: manager.validate, format: manager.format,
     reset: () => {
       if (manager.getState().isSubmitting) return
       manager.reset(); setResponse(undefined); setHasResponse(false); setError(null)
+    },
+    resetField: (name) => {
+      if (manager.getState().isSubmitting) return
+      manager.resetField(name)
     },
     submit: async () => {
       if (!mounted.current || manager.getState().isSubmitting

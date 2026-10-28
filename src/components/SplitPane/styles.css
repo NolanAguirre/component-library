@@ -84,6 +84,14 @@
   height: 1px;
 }
 
+.split-pane--stacked {
+  flex-direction: column;
+}
+
+.split-pane--stacked > .split-pane__pane--first {
+  border-bottom: 1px solid var(--split-pane-border, #374151);
+}
+
 .split-pane--dragging > .split-pane__pane {
   pointer-events: none;
 }

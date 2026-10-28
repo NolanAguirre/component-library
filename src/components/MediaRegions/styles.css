@@ -1,0 +1,60 @@
+.media-regions {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.media-regions__stage {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  cursor: crosshair;
+  touch-action: none;
+  user-select: none;
+}
+
+.media-regions--disabled .media-regions__stage {
+  cursor: default;
+}
+
+.media-regions__image {
+  display: block;
+  max-width: 100%;
+  max-height: 70vh;
+  pointer-events: none;
+}
+
+.media-regions__region {
+  position: absolute;
+  padding: 0;
+  border: 2px solid #f8fafc;
+  background: rgba(248, 250, 252, 0.12);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+}
+
+.media-regions__region.is-selected {
+  border-style: dashed;
+  background: rgba(248, 250, 252, 0.25);
+}
+
+.media-regions__region--draft {
+  border-style: dashed;
+  pointer-events: none;
+}
+
+.media-regions__region--success { border-color: #22c55e; }
+.media-regions__region--danger { border-color: #ef4444; }
+.media-regions__region--warning { border-color: #f59e0b; }
+
+.media-regions__label {
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  padding: 0 4px;
+  font-size: 11px;
+  line-height: 16px;
+  color: #0f172a;
+  background: #f8fafc;
+  white-space: nowrap;
+}

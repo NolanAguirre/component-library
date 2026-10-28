@@ -2,7 +2,7 @@
 
 .PHONY: help start build install check-dev-ids
 
-DEV_ID_DIRS ?= src ../ui/vpr/src ../ui/lft/src ../ui/tgr/src
+DEV_ID_DIRS ?= src ../ui/vpr/src ../ui/lft/src ../ui/tgr/src ../ui/3d/src
 
 help:
 	@echo ""

@@ -31,6 +31,14 @@
   color: #e5e7eb;
 }
 
+@media (max-width: 640px) {
+  .popup__panel {
+    min-width: 0;
+    max-width: calc(100vw - 1rem);
+    padding: 1.25rem;
+  }
+}
+
 .popup__panel--lightbox {
   width: 100%;
   height: 90vh;
