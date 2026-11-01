@@ -1,0 +1,17 @@
+/* ── PromptInput ─────────────────────────────────────────── */
+
+.prompt-input__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.prompt-input__chip {
+  font-size: 11px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  color: var(--accent, #93c5fd);
+  background: color-mix(in srgb, var(--accent, #93c5fd) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent, #93c5fd) 40%, transparent);
+  cursor: default;
+}

@@ -10,16 +10,24 @@ import './styles.css'
  * Props:
  *   children   {node}    — text (or inline content) to show
  *   className  {string}  — extra class names on the viewport
+ *   animate    {'always'|'hover'} — 'hover' measures and scrolls only while
+ *                          the pointer is over the viewport (default 'always')
  *   ...rest               — spread onto the viewport (title, aria-*)
  */
-const ScrollingText = ({ children, className = '', ...rest }) => {
+const ScrollingText = ({ children, className = '', animate = 'always', onPointerEnter, onPointerLeave, ...rest }) => {
   const viewportRef = useRef(null)
   const copyRef = useRef(null)
   const [motion, setMotion] = useState(null)
+  const [hovered, setHovered] = useState(false)
+  const enabled = animate !== 'hover' || hovered
 
   useEffect(() => {
     const viewport = viewportRef.current
     const copy = copyRef.current
+    if (!enabled) {
+      setMotion(null)
+      return undefined
+    }
     if (!viewport || !copy) return undefined
 
     const measure = () => {
@@ -50,7 +58,17 @@ const ScrollingText = ({ children, className = '', ...rest }) => {
     observer.observe(viewport)
     observer.observe(copy)
     return () => observer.disconnect()
-  }, [children])
+  }, [children, enabled])
+
+  const handlePointerEnter = (event) => {
+    if (animate === 'hover') setHovered(true)
+    onPointerEnter?.(event)
+  }
+
+  const handlePointerLeave = (event) => {
+    if (animate === 'hover') setHovered(false)
+    onPointerLeave?.(event)
+  }
 
   const classes = ['scrolling-text', motion ? 'scrolling-text--active' : '', className]
     .filter(Boolean)
@@ -65,6 +83,8 @@ const ScrollingText = ({ children, className = '', ...rest }) => {
         '--scrolling-text-gap': `${motion.gap}px`,
         '--scrolling-text-duration': `${motion.duration}s`,
       } : undefined}
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
       {...rest}
     >
       <span className="scrolling-text__track">

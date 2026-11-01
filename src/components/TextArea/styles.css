@@ -1,0 +1,42 @@
+/* ── TextArea ────────────────────────────────────────────── */
+
+.text-area {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.text-area__field {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.text-area__field > textarea {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Box metrics and background are copied from the textarea at runtime. */
+.text-area__backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-style: solid;
+  border-color: transparent;
+  color: transparent;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  pointer-events: none;
+}
+
+.text-area__backdrop mark {
+  color: transparent;
+  background: color-mix(in srgb, var(--accent, #93c5fd) 28%, transparent);
+  border-radius: 3px;
+}
