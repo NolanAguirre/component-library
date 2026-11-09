@@ -6,7 +6,7 @@ import './styles.css'
 
 const MENU_GAP = 4
 const VIEWPORT_PAD = 8
-const MENU_MAX = 240
+const MENU_MAX = 480
 const MENU_MIN = 72
 
 // The menu is portalled so an overflow container (a popup panel) cannot scroll
@@ -173,18 +173,20 @@ export const DropdownTypeaheadMenu = ({
 
   if (!isOpen) return null
 
-  const items = Children.count(children) > 0
-    ? Children.toArray(children).filter((child) =>
-      !filterable || filteredOptions.some((option) => option.value === child.props.value)
-    )
+  const childItems = Children.toArray(children)
+  const items = childItems.length > 0
+    ? filterable
+      ? filteredOptions.flatMap((option) => childItems.filter((child) => child.props.value === option.value))
+      : childItems
     : filteredOptions.map((opt) => (
-      <DropdownTypeaheadItem key={String(opt.value ?? 'null')} value={opt.value}>
+      <DropdownTypeaheadItem key={String(opt.value ?? 'null')} value={opt.value} favorite={Boolean(opt.favorite)}>
         {opt.displayValue}
       </DropdownTypeaheadItem>
     ))
 
   const enhanced = items.map((child, index) =>
     cloneElement(child, {
+      favorite: Boolean(child.props.favorite) || Boolean(filteredOptions.find((opt) => opt.value === child.props.value)?.favorite),
       dropdown: { select, selected, highlighted: index === highlightedIndex },
     })
   )
@@ -236,18 +238,25 @@ export const DropdownTypeaheadMenu = ({
  *
  * Receives dropdown:{ select, selected, highlighted } via DropdownTypeaheadMenu.
  */
-export const DropdownTypeaheadItem = ({ value, children, dropdown: { select, selected, highlighted } = {} }) => {
+export const DropdownTypeaheadItem = ({ value, children, favorite = false, dropdown: { select, selected, highlighted } = {} }) => {
   const isSelected = selected === value
 
   return (
     <li
-      className={`form-dropdown__item${isSelected ? ' form-dropdown__item--selected' : ''}${highlighted ? ' form-dropdown__item--highlighted' : ''}`}
+      className={`form-dropdown__item${isSelected ? ' form-dropdown__item--selected' : ''}${highlighted ? ' form-dropdown__item--highlighted' : ''}${favorite ? ' form-dropdown__item--favorite' : ''}`}
       role="option"
       aria-selected={isSelected}
       onClick={() => select?.(value)}
     >
       {children}
-      {isSelected && <span className="form-dropdown__item-check" aria-hidden="true">✓</span>}
+      {favorite ? (
+        <span className="form-dropdown__item-favorite" aria-hidden="true">
+          ★
+          {isSelected && <span className="form-dropdown__item-check">✓</span>}
+        </span>
+      ) : (
+        isSelected && <span className="form-dropdown__item-check" aria-hidden="true">✓</span>
+      )}
     </li>
   )
 }

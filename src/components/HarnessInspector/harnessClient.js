@@ -34,6 +34,10 @@ const createHarnessClient = ({ baseUrl }) => {
     plan: (id, prompt) => request(`${session(id)}/plan`, { prompt }),
     run: (id, { prompt, mode }) => request(`${session(id)}/run`, { prompt, mode }),
     decompose: (id, prompt) => request(`${session(id)}/decompose`, { prompt }),
+    stopSession: id => request(`${session(id)}/stop`, {}),
+    answerQuestion: (id, questionId, answer) => request(
+      `${session(id)}/questions/${encodeURIComponent(questionId)}/answer`, { answer },
+    ),
     getLog: async (id, { signal } = {}) => {
       const response = await fetch(`${base}${session(id)}/log`, { signal })
       if (!response.ok) await fail(response)

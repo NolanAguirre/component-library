@@ -10,12 +10,13 @@ export const parseTriggers = json => (Array.isArray(json) ? json : json?.trigger
 }))
 
 // Matches from every applicable trigger, sorted by position. When matches
-// overlap, the earlier (then longer) one wins.
-export const findTriggers = (text, triggers, { steer = false } = {}) => {
+// overlap, the earlier (then longer) one wins. `first: false` skips triggers
+// scoped to an agent's first prompt.
+export const findTriggers = (text, triggers, { first = true } = {}) => {
   if (typeof text !== 'string' || !text || !triggers?.length) return []
   const matches = []
   for (const trigger of triggers) {
-    if (steer && trigger.steer === false) continue
+    if (!first && trigger.scope === 'first') continue
     for (const pattern of trigger.patterns) {
       for (const match of text.matchAll(pattern)) {
         if (!match[0]) continue

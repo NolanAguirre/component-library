@@ -820,6 +820,8 @@ const MediaPickerDemo = ({
   emptyText,
   tileAction,
   tileCaption,
+  buttonDevId,
+  pickerDevId,
 } = {}) => {
   const [open, setOpen] = useState(false)
   const [chosen, setChosen] = useState([])
@@ -831,12 +833,7 @@ const MediaPickerDemo = ({
 
   return (
     <>
-      <DevScope id={{
-        'Browse media': 'b3k58w0',
-        'Loading media': 'a9k2p1x',
-        'Empty picker': 'c7n4w8m',
-        'Pick one': 'd2h6t3q',
-      }[title] ?? 'b3k58w0'}>
+      <DevScope id={buttonDevId} state={{ title }}>
         <Button variant="primary" onClick={() => setOpen(true)}>Open Media Picker</Button>
       </DevScope>
       {chosen.length > 0 && (
@@ -844,12 +841,7 @@ const MediaPickerDemo = ({
           Selected: {chosen.map((item) => item.name).join(', ')}
         </p>
       )}
-      <DevScope id={{
-        'Browse media': 'y5t9vut',
-        'Loading media': 'p4s8k2n',
-        'Empty picker': 'r6m1c9w',
-        'Pick one': 't8v3b5h',
-      }[title] ?? 'y5t9vut'}>
+      <DevScope id={pickerDevId} state={{ title }}>
         <MediaPicker
                 items={items}
                 loading={loading}
@@ -991,26 +983,22 @@ const CreatableDropdownDemo = () => {
   )
 }
 
-const NormalDropdownDemo = ({ placement }) => {
+const NormalDropdownDemo = ({ placement, devId, termDevId, entityDevId, boardDevId }) => {
   const [picked, setPicked] = useState('none')
-  const ids = {
-    'bottom-right': { dropdown: 'gtqavzo', term: 'yz8w7rr', entity: 'tt9hs46', board: 'e5kmn1i' },
-    'top-center': { dropdown: 'n64gmq8', term: 'k84f5j4', entity: 'e5fpf8w', board: 'gz87aif' },
-  }[placement]
 
   return (
     <div style={{ display: 'flex', gap: '2rem', alignItems: 'center', padding: '4rem 0' }}>
-      <DevScope id={ids.dropdown}>
+      <DevScope id={devId} state={{ placement }}>
         <Dropdown placement={placement}>
           <Button variant="secondary">Add to… ({placement})</Button>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', padding: '0.5rem', minWidth: '10rem', background: '#1f2937', border: '1px solid #374151', borderRadius: '0.5rem' }}>
-            <DevScope id={ids.term}>
+            <DevScope id={termDevId} state={{ placement }}>
               <Button variant="ghost" onClick={() => setPicked('Term')}>Term</Button>
             </DevScope>
-            <DevScope id={ids.entity}>
+            <DevScope id={entityDevId} state={{ placement }}>
               <Button variant="ghost" onClick={() => setPicked('Entity')}>Entity</Button>
             </DevScope>
-            <DevScope id={ids.board}>
+            <DevScope id={boardDevId} state={{ placement }}>
               <Button variant="ghost" onClick={() => setPicked('Asset Board')}>Asset Board</Button>
             </DevScope>
           </div>
@@ -1552,8 +1540,8 @@ const SelectDemo = () => {
   )
 }
 
-const DrawerDemo = ({ placement }) => (
-  <DevScope id={{ left: 'fh2vpm5', right: 'u5l4s3q', top: 'gqhu7lp', bottom: 'fpmx6m5' }[placement]}>
+const DrawerDemo = ({ placement, devId }) => (
+  <DevScope id={devId} state={{ placement }}>
     <Drawer placement={placement}>
       <div style={{ padding: '1rem', minWidth: '16rem' }}>
         <h2 style={{ marginTop: 0 }}>{placement} drawer</h2>
@@ -2354,7 +2342,7 @@ const App = () => (
           <FoldTrigger>Click Dropdown (bottom-right)</FoldTrigger>
           <FoldContent>
             <DevScope id="bjnq52i">
-              <NormalDropdownDemo placement="bottom-right" />
+              <NormalDropdownDemo placement="bottom-right" devId="gtqavzo" termDevId="yz8w7rr" entityDevId="tt9hs46" boardDevId="e5kmn1i" />
             </DevScope>
           </FoldContent>
         </Fold>
@@ -2365,7 +2353,7 @@ const App = () => (
           <FoldTrigger>Click Dropdown (top-center)</FoldTrigger>
           <FoldContent>
             <DevScope id="rydgqx8">
-              <NormalDropdownDemo placement="top-center" />
+              <NormalDropdownDemo placement="top-center" devId="n64gmq8" termDevId="k84f5j4" entityDevId="e5fpf8w" boardDevId="gz87aif" />
             </DevScope>
           </FoldContent>
         </Fold>
@@ -2857,6 +2845,8 @@ const App = () => (
           <FoldContent>
             <DevScope id="f3ir4t8">
               <MediaPickerDemo
+                buttonDevId="b3k58w0"
+                pickerDevId="y5t9vut"
                 tileAction={(item) => (
                   <button
                     type="button"
@@ -2880,7 +2870,7 @@ const App = () => (
           <FoldTrigger>Media Picker Loading</FoldTrigger>
           <FoldContent>
             <DevScope id="bjd7bt5">
-              <MediaPickerDemo loading title="Loading media" />
+              <MediaPickerDemo loading title="Loading media" buttonDevId="a9k2p1x" pickerDevId="p4s8k2n" />
             </DevScope>
           </FoldContent>
         </Fold>
@@ -2891,7 +2881,7 @@ const App = () => (
           <FoldTrigger>Media Picker Empty</FoldTrigger>
           <FoldContent>
             <DevScope id="lsxlibn">
-              <MediaPickerDemo items={[]} emptyText="No media available" title="Empty picker" />
+              <MediaPickerDemo items={[]} emptyText="No media available" title="Empty picker" buttonDevId="c7n4w8m" pickerDevId="r6m1c9w" />
             </DevScope>
           </FoldContent>
         </Fold>
@@ -2902,7 +2892,7 @@ const App = () => (
           <FoldTrigger>Media Picker Single</FoldTrigger>
           <FoldContent>
             <DevScope id="qeiotz4">
-              <MediaPickerDemo multiple={false} title="Pick one" />
+              <MediaPickerDemo multiple={false} title="Pick one" buttonDevId="d2h6t3q" pickerDevId="t8v3b5h" />
             </DevScope>
           </FoldContent>
         </Fold>
@@ -3076,7 +3066,7 @@ const App = () => (
           <FoldTrigger>Left</FoldTrigger>
           <FoldContent>
             <DevScope id="yf9oogi">
-              <DrawerDemo placement="left" />
+              <DrawerDemo placement="left" devId="fh2vpm5" />
             </DevScope>
           </FoldContent>
         </Fold>
@@ -3087,7 +3077,7 @@ const App = () => (
           <FoldTrigger>Right</FoldTrigger>
           <FoldContent>
             <DevScope id="p94uy6e">
-              <DrawerDemo placement="right" />
+              <DrawerDemo placement="right" devId="u5l4s3q" />
             </DevScope>
           </FoldContent>
         </Fold>
@@ -3098,7 +3088,7 @@ const App = () => (
           <FoldTrigger>Top</FoldTrigger>
           <FoldContent>
             <DevScope id="uxh6vrk">
-              <DrawerDemo placement="top" />
+              <DrawerDemo placement="top" devId="gqhu7lp" />
             </DevScope>
           </FoldContent>
         </Fold>
@@ -3109,7 +3099,7 @@ const App = () => (
           <FoldTrigger>Bottom</FoldTrigger>
           <FoldContent>
             <DevScope id="o4gwc82">
-              <DrawerDemo placement="bottom" />
+              <DrawerDemo placement="bottom" devId="fpmx6m5" />
             </DevScope>
           </FoldContent>
         </Fold>

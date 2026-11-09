@@ -71,7 +71,7 @@
   margin: 0;
   padding: 0.25rem 0;
   list-style: none;
-  max-height: 15rem;
+  max-height: 30rem;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
@@ -139,6 +139,33 @@
 .form-dropdown__item--selected {
   color: #60a5fa;
   font-weight: 500;
+}
+
+.form-dropdown__item--favorite,
+.form-dropdown__item--favorite:hover,
+.form-dropdown__item--favorite.form-dropdown__item--highlighted,
+.form-dropdown__item--favorite.form-dropdown__item--selected {
+  color: #e8b34e;
+}
+
+.form-dropdown__item-favorite {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 1.1em;
+  height: 1.1em;
+  color: #e8b34e;
+  margin-left: auto;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.form-dropdown__item-favorite .form-dropdown__item-check {
+  position: absolute;
+  margin: 0;
+  font-size: 0.55em;
+  color: #1f2937;
+  line-height: 1;
 }
 
 .form-dropdown__item-check {

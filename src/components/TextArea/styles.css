@@ -21,6 +21,14 @@
   min-width: 0;
 }
 
+.text-area__overlay {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  z-index: 2;
+  display: flex;
+}
+
 /* Box metrics and background are copied from the textarea at runtime. */
 .text-area__backdrop {
   position: absolute;

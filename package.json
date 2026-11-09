@@ -12,11 +12,13 @@
       "import": "./dist/component-library.js",
       "default": "./dist/component-library.js"
     },
+    "./source": "./src/index.js",
     "./dist/component-library.css": "./dist/component-library.css",
     "./style.css": "./dist/component-library.css"
   },
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "scripts": {
     "dev": "vite",

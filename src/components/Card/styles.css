@@ -17,6 +17,38 @@
   color: #f9fafb;
 }
 
+button.card__header--toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  margin: 0;
+  border-top: none;
+  border-right: none;
+  border-left: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.card__header--collapsed {
+  border-bottom: none;
+}
+
+.card__toggle-mark {
+  flex-shrink: 0;
+  font-size: 0.75em;
+  line-height: 1;
+}
+
+.card__toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+}
+
 /* ── Section ─────────────────────────────────────────────── */
 
 .card__section {

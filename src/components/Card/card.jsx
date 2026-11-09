@@ -13,12 +13,31 @@ export default Card
 
 /**
  * CardHeader — the top section of the card, typically used for a title.
+ *
+ * Pass `onToggle` to make the header a collapse control. `open` sets
+ * aria-expanded and the collapsed border.
  */
-export const CardHeader = ({ children }) => (
-  <div className="card__header">
-    {children}
-  </div>
-)
+export const CardHeader = ({ children, open = true, onToggle }) => {
+  if (!onToggle) {
+    return (
+      <div className="card__header">
+        {children}
+      </div>
+    )
+  }
+
+  return (
+    <button
+      type="button"
+      className={`card__header card__header--toggle${open ? '' : ' card__header--collapsed'}`}
+      aria-expanded={open}
+      onClick={onToggle}
+    >
+      <span className="card__toggle-mark" aria-hidden="true">{open ? '▾' : '▸'}</span>
+      <span className="card__toggle-label">{children}</span>
+    </button>
+  )
+}
 
 /**
  * CardSection — the main body content area of the card.

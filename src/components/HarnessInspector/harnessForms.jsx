@@ -69,7 +69,7 @@ export const HarnessFields = ({ form, inspector, client, workspace, preferredWor
   }, [attempt, client, preferredWorkspaceId, setValue])
 
   const workspaceLabel = workspace?.label || workspace?.name || 'the workspace'
-  return <DevScope id="harness-inspector-form">
+  return <DevScope id="1gd20wn" state={{ loaded, busy: form.isSubmitting }}>
     {error && <p role="alert">{error}. Check that the harness service is running.</p>}
     {!loaded && !error && <p role="status">Loading workspaces and providers…</p>}
     {loaded && !form.values.workspaceId && <p>Choose a workspace. If {workspaceLabel} is missing, create it in the harness and refresh.</p>}
@@ -83,46 +83,56 @@ export const HarnessFields = ({ form, inspector, client, workspace, preferredWor
       setError(null)
       setAttempt(value => value + 1)
     }}>Refresh options</button>
-    <label className="form__label" htmlFor="harness-workspace">Workspace</label>
-    <select id="harness-workspace" className="form__select" value={form.values.workspaceId}
-      disabled={!loaded || form.isSubmitting} onChange={event => {
-        form.setValue('workspaceId', event.target.value)
-      }}>
-      <option value="">Choose a workspace</option>
-      {workspaces.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
-    </select>
-    <label className="form__label" htmlFor="harness-provider">Provider</label>
-    <select id="harness-provider" className="form__select" value={form.values.provider}
-      disabled={!loaded || form.isSubmitting} onChange={event => {
-        const next = providers.find(item => item.id === event.target.value)
-        form.setValue('provider', next?.id || '')
-        form.setValue('model', next?.models?.[0]?.id || '')
-      }}>
-      <option value="">Choose a provider</option>
-      {providers.map(item => <option key={item.id} value={item.id} disabled={!item.implemented || Boolean(item.error)}>
-        {item.id}{!item.implemented || item.error ? ' (unavailable)' : ''}
-      </option>)}
-    </select>
-    <label className="form__label" htmlFor="harness-model">Model</label>
-    <select id="harness-model" className="form__select" value={form.values.model}
-      disabled={!loaded || !provider || form.isSubmitting}
-      onChange={event => form.setValue('model', event.target.value)}>
-      <option value="">Provider default</option>
-      {models.map(model => <option key={model.id} value={model.id}>{model.displayName || model.id}</option>)}
-    </select>
+    <DevScope id="2036i1d">
+      <label className="form__label" htmlFor="harness-workspace">Workspace</label>
+      <select id="harness-workspace" className="form__select" value={form.values.workspaceId}
+        disabled={!loaded || form.isSubmitting} onChange={event => {
+          form.setValue('workspaceId', event.target.value)
+        }}>
+        <option value="">Choose a workspace</option>
+        {workspaces.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
+      </select>
+    </DevScope>
+    <DevScope id="44op6ej">
+      <label className="form__label" htmlFor="harness-provider">Provider</label>
+      <select id="harness-provider" className="form__select" value={form.values.provider}
+        disabled={!loaded || form.isSubmitting} onChange={event => {
+          const next = providers.find(item => item.id === event.target.value)
+          form.setValue('provider', next?.id || '')
+          form.setValue('model', next?.models?.[0]?.id || '')
+        }}>
+        <option value="">Choose a provider</option>
+        {providers.map(item => <option key={item.id} value={item.id} disabled={!item.implemented || Boolean(item.error)}>
+          {item.id}{!item.implemented || item.error ? ' (unavailable)' : ''}
+        </option>)}
+      </select>
+    </DevScope>
+    <DevScope id="9esxvp5">
+      <label className="form__label" htmlFor="harness-model">Model</label>
+      <select id="harness-model" className="form__select" value={form.values.model}
+        disabled={!loaded || !provider || form.isSubmitting}
+        onChange={event => form.setValue('model', event.target.value)}>
+        <option value="">Provider default</option>
+        {models.map(model => <option key={model.id} value={model.id}>{model.displayName || model.id}</option>)}
+      </select>
+    </DevScope>
     <p>Each submission creates a new session in the selected workspace.</p>
-    <label className="form__label" htmlFor="harness-action">Action</label>
-    <select id="harness-action" className="form__select" value={form.values.action}
-      disabled={form.isSubmitting} onChange={event => form.setValue('action', event.target.value)}>
-      <option value="plan">Plan</option><option value="run">Run</option><option value="decompose">Decompose</option>
-    </select>
-    <label className="form__label" htmlFor="harness-prompt">Prompt</label>
-    <PromptInput client={client} id="harness-prompt" className="form__textarea" rows={5} value={form.values.prompt}
-      disabled={form.isSubmitting} onChange={event => {
-        setSuppressPromptError(false)
-        form.setValue('prompt', event.target.value)
-      }}
-      onSubmit={form.submit} />
+    <DevScope id="l42rkja">
+      <label className="form__label" htmlFor="harness-action">Action</label>
+      <select id="harness-action" className="form__select" value={form.values.action}
+        disabled={form.isSubmitting} onChange={event => form.setValue('action', event.target.value)}>
+        <option value="plan">Plan</option><option value="run">Run</option><option value="decompose">Decompose</option>
+      </select>
+    </DevScope>
+    <DevScope id="wimkusb">
+      <label className="form__label" htmlFor="harness-prompt">Prompt</label>
+      <PromptInput client={client} id="harness-prompt" className="form__textarea" rows={5} value={form.values.prompt}
+        disabled={form.isSubmitting} onChange={event => {
+          setSuppressPromptError(false)
+          form.setValue('prompt', event.target.value)
+        }}
+        onSubmit={form.submit} />
+    </DevScope>
     {Object.entries(form.errors).map(([name, fieldError]) => form.touched[name] && fieldError
       && !(suppressPromptError && name === 'prompt')
       ? <p key={name} role="alert">{fieldError}</p> : null)}
@@ -157,7 +167,9 @@ const createHarnessForms = ({ client, workspace, preferredWorkspaceId }) => [{
         : await client[action](session.id, prompt)
       return { session, ...response }
     } catch (error) {
-      throw new Error(`Session ${session.id} was created, but ${action} failed: ${error.message}. Submitting again will create another session.`)
+      const failure = new Error(`Session ${session.id} was created, but ${action} failed: ${error.message}. Submitting again will create another session.`)
+      failure.sessionId = session.id
+      throw failure
     }
   },
 }]

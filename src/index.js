@@ -21,6 +21,7 @@ export { default as Drawer, DrawerDisplay, withDrawer } from './components/Drawe
 export { default as Dropdown } from './components/Dropdown/dropdown'
 export { default as TextArea } from './components/TextArea/textArea'
 export { default as PromptInput } from './components/PromptInput/promptInput'
+export { default as ImageAttachments, ImageAttachmentsDisplay, ImageAttachmentPreviews, withImageAttachments } from './components/ImageAttachments/imageAttachments'
 export { default as Fold, FoldDisplay, FoldTrigger, FoldContent } from './components/Fold/fold'
 export { default as Form, FormDisplay, FormField, FormLabel, FormInput, FormTextarea, FormSelect, FormError, FormSubmit } from './components/Form/form'
 export { fieldTypes } from './components/Form/fieldTypes'

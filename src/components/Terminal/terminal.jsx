@@ -64,6 +64,13 @@ const Terminal = forwardRef(({ onData, onResize, focused = false, fontSize = 13,
       scrollback: 5000,
       theme: THEME,
     })
+    term.attachCustomKeyEventHandler((event) => {
+      if (event.ctrlKey && !event.shiftKey && !event.altKey && !event.metaKey && event.key.toLowerCase() === 'v') {
+        // Let the browser paste through xterm's paste handler instead of sending ^V.
+        return false
+      }
+      return true
+    })
     const fitAddon = new FitAddon()
     term.loadAddon(fitAddon)
     term.open(hostRef.current)

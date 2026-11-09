@@ -23,9 +23,9 @@ const loadTriggers = client => {
  * PromptInput — TextArea that highlights harness prompt triggers and shows a
  * chip per firing trigger. Pass `triggers` directly, or a harness `client`
  * with `getPromptTriggers()`. Without triggers it is a plain textarea.
- * `steer` skips triggers steers cannot fire.
+ * `first={false}` skips triggers that only fire on an agent's first prompt.
  */
-const PromptInput = ({ triggers, client, steer = false, value, ...rest }) => {
+const PromptInput = ({ triggers, client, first = true, value, ...rest }) => {
   const [fetched, setFetched] = useState(null)
 
   useEffect(() => {
@@ -39,7 +39,7 @@ const PromptInput = ({ triggers, client, steer = false, value, ...rest }) => {
 
   const active = triggers || fetched
   const text = value == null ? '' : String(value)
-  const matches = useMemo(() => (active ? findTriggers(text, active, { steer }) : null), [active, text, steer])
+  const matches = useMemo(() => (active ? findTriggers(text, active, { first }) : null), [active, text, first])
   const fired = useMemo(() => {
     if (!matches?.length) return []
     const ids = new Set(matches.map(match => match.id))

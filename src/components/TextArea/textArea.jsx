@@ -32,9 +32,10 @@ const segments = (text, highlights) => {
  * TextArea — textarea with optional highlight backdrop and Ctrl/⌘+Enter submit.
  * `highlights` is `[{ start, end, ...data }]`; each range renders as `<mark data-*>`
  * behind the text. The backdrop copies the textarea's computed box, so any
- * textarea class lines up. `children` render below the field.
+ * textarea class lines up. `overlay` sits on the bottom-right of the field.
+ * `children` render below the field.
  */
-const TextArea = ({ value, onChange, onKeyDown, onInput, onScroll, onSubmit, highlights, children, ...rest }) => {
+const TextArea = ({ value, onChange, onKeyDown, onInput, onScroll, onSubmit, highlights, overlay, children, ...rest }) => {
   const fieldRef = useRef(null)
   const backdropRef = useRef(null)
   const text = value == null ? '' : String(value)
@@ -101,6 +102,7 @@ const TextArea = ({ value, onChange, onKeyDown, onInput, onScroll, onSubmit, hig
           onKeyDown={handleKeyDown}
           onScroll={handleScroll}
         />
+        {overlay && <div className="text-area__overlay">{overlay}</div>}
       </div>
       {children}
     </div>
