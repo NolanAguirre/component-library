@@ -71,6 +71,12 @@
   overflow: hidden;
 }
 
+@property --dev-inspector-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
 .dev-inspector__toggle {
   display: flex;
   align-items: center;
@@ -80,6 +86,31 @@
   padding: 0;
   color: #9ca3af;
   cursor: pointer;
+  border-width: 0.125rem;
+  border-color: transparent;
+  background:
+    linear-gradient(#111827, #111827) padding-box,
+    conic-gradient(
+      from var(--dev-inspector-angle),
+      #374151 0deg,
+      #374151 240deg,
+      #fde68a 300deg,
+      #f59e0b 330deg,
+      #374151 360deg
+    ) border-box;
+  animation: dev-inspector-shimmer 2.4s linear infinite;
+}
+
+@keyframes dev-inspector-shimmer {
+  to { --dev-inspector-angle: 360deg; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dev-inspector__toggle {
+    animation: none;
+    border-color: #f59e0b;
+    background: #111827;
+  }
 }
 
 .dev-inspector__panel:hover,

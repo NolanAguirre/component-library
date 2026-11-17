@@ -30,6 +30,7 @@ export const FoldDisplay = ({ isOpen = false, toggle = () => {}, children }) => 
  */
 export const FoldTrigger = ({ fold: { isOpen, toggle } = {}, children }) => (
   <button
+    type="button"
     className={`fold__trigger${isOpen ? ' fold__trigger--open' : ''}`}
     onClick={toggle}
     aria-expanded={isOpen}
